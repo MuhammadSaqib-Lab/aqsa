@@ -1,19 +1,21 @@
 import type { AppointmentFormValues } from "../types";
+import { apiRequest } from "./apiClient";
 
 /**
- * Frontend-only stand-in for a real appointment booking API.
- *
- * To connect a backend later:
- *   1. Replace the body of this function with a real request, e.g.
- *      `fetch("/api/appointments", { method: "POST", body: JSON.stringify(values) })`.
- *   2. Surface server-side validation errors by throwing an Error with a
- *      user-facing message — the caller already handles the rejected promise.
- *   3. Remove the artificial delay below.
+ * Submits an appointment request to the backend (POST /api/appointments).
+ * Resolves with the created appointment's id on success; throws
+ * ApiRequestError (via apiRequest) with a user-facing message on failure,
+ * which AppointmentForm's existing catch block already surfaces as a toast.
  */
 export async function submitAppointmentRequest(
   values: AppointmentFormValues
-): Promise<{ ok: true }> {
-  await new Promise((resolve) => setTimeout(resolve, 1200));
-  console.info("[Appointment request — frontend only, not sent anywhere]", values);
-  return { ok: true };
+): Promise<{ id: string }> {
+  return apiRequest<{ id: string }>("/appointments", {
+    method: "POST",
+    body: {
+      ...values,
+      email: values.email.trim() || undefined,
+      message: values.message.trim() || undefined,
+    },
+  });
 }

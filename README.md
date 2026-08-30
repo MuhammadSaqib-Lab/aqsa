@@ -1,8 +1,13 @@
 # Aqsa Physiotherapy Centre — Website
 
-A modern, responsive marketing website for Aqsa Physiotherapy Centre, a physiotherapy and rehabilitation clinic in Haripur, Khyber Pakhtunkhwa, Pakistan.
+A modern, responsive marketing website for Aqsa Physiotherapy Centre, a physiotherapy and rehabilitation clinic in Haripur, Khyber Pakhtunkhwa, Pakistan, with a companion backend API for appointment and contact management.
 
-Frontend-only — there is no backend, database, authentication, or payment processing. All content is static and client-side, with the appointment form ready to connect to a real API later.
+This repo has two independent projects:
+
+- **This directory** — the frontend (React + Vite).
+- **[`backend/`](backend/)** — the API (Node + Express + PostgreSQL/Prisma). See [backend/README.md](backend/README.md) to run it.
+
+The frontend's appointment form submits to the backend at `VITE_API_URL` (see `.env.example`); everything else on the site is still static content, no auth or payments involved.
 
 ## Features
 
@@ -33,6 +38,8 @@ npm run dev
 
 Then open the printed local URL (defaults to `http://localhost:5173`).
 
+By default the app talks to `http://localhost:5000/api`. To point it elsewhere, copy `.env.example` to `.env.local` and set `VITE_API_URL`. Without a backend running, the appointment form will show a network-error toast when submitted — see [backend/README.md](backend/README.md) to run the API.
+
 ### Other commands
 
 ```bash
@@ -56,9 +63,12 @@ src/
     ui/                    # Button, Modal, SectionHeading, scroll-reveal wrapper
   context/                # Toast notifications and appointment modal state
   hooks/                  # Scroll spy, scroll progress, reduced motion, intersection observer, etc.
-  lib/appointmentApi.ts   # Appointment form submission — stubbed, ready for a real backend
+  lib/
+    apiClient.ts           # Centralized fetch client (base URL, headers, timeout, error handling)
+    appointmentApi.ts      # Appointment form submission — calls POST /api/appointments
 public/
   images/                 # Logo, team photos, and clinic photos used on the site
+backend/                  # Separate Node/Express/PostgreSQL API — see backend/README.md
 ```
 
 See [CLAUDE.md](CLAUDE.md) for a full file-by-file breakdown and the current clinic data reference.
@@ -78,6 +88,6 @@ A few placeholders still need real information before this goes live:
 - **Map embed** — currently a text-query embed, not a verified pin
 - **Facebook/Instagram links** — currently `#`; the clinic's Facebook page name is known ("Aqsa Physio Therpy") but not its URL
 
-## Connecting a real backend
+## Backend
 
-The appointment form (`src/components/forms/AppointmentForm.tsx`) is fully built with validation and UI states. To wire it up to a real backend, only `submitAppointmentRequest` in [src/lib/appointmentApi.ts](src/lib/appointmentApi.ts) needs to change.
+The appointment form (`src/components/forms/AppointmentForm.tsx`) submits to the API in [`backend/`](backend/) via [`src/lib/appointmentApi.ts`](src/lib/appointmentApi.ts). See [backend/README.md](backend/README.md) for setup, environment variables, database migrations, and the full API reference — including the admin endpoints for managing appointments and contact messages.

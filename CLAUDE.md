@@ -1,7 +1,14 @@
 # Aqsa Physiotherapy Centre — Website
 
-Frontend-only marketing site for Aqsa Physiotherapy Centre (Haripur, KPK, Pakistan).
-No backend, database, auth, or payment system — everything here is static/client-side.
+Marketing site for Aqsa Physiotherapy Centre (Haripur, KPK, Pakistan), with a companion
+backend API. No payment system.
+
+**Two independent projects in this repo:**
+- Project root (`src/`, this file) — the frontend, documented below.
+- [`backend/`](backend/) — separate Node/Express/PostgreSQL/Prisma API with its own
+  `package.json`, own `CLAUDE.md`-equivalent in [`backend/README.md`](backend/README.md).
+  The frontend only talks to it over HTTP via `VITE_API_URL`; nothing is shared/imported
+  between the two.
 
 ## Stack
 
@@ -55,8 +62,11 @@ src/
     useScrollSpy.ts                 # Tracks which section is in view, powers Navbar active-link state
 
   lib/
-    appointmentApi.ts               # submitAppointmentRequest() — CURRENTLY A STUB (setTimeout + console.log).
-                                     # The one place to wire up a real backend later.
+    apiClient.ts                    # Centralized fetch client for backend/ — base URL (VITE_API_URL),
+                                     # JSON headers, timeout/abort, and error normalization (ApiRequestError).
+    appointmentApi.ts               # submitAppointmentRequest() — POSTs to backend/'s /api/appointments
+                                     # via apiClient. Resolves { id } on success, throws ApiRequestError
+                                     # (with the server's message) on failure.
 
   components/
     layout/
@@ -145,9 +155,15 @@ All of the above (except testimonials, hours, map pin, and social URLs) is trans
 - The Google Maps embed uses a text-query embed (`clinic.mapEmbedSrc`), not a verified pin — replace with the exact location once confirmed.
 - Facebook/Instagram links in `clinic.social` are placeholders (`#`) — the clinic's real Facebook page name is known ("Aqsa Physio Therpy") but not its URL.
 
-## Notes for future backend work
+## Backend integration
 
-The appointment form (`src/components/forms/AppointmentForm.tsx`) already has full client-side validation, loading/success/error states, and accessible markup. To connect a real backend, only `submitAppointmentRequest` in `src/lib/appointmentApi.ts` needs to change — the form component itself shouldn't need edits. The success message already discloses to users that no appointment is booked on a live server yet; update that copy once a real backend is wired up.
+The appointment form (`src/components/forms/AppointmentForm.tsx`) now submits to the real backend in [`backend/`](backend/) — see [backend/README.md](backend/README.md) for how to run it (PostgreSQL + Prisma, `npm run dev` inside `backend/`). Frontend changes made for this:
+
+- `src/lib/appointmentApi.ts` calls `POST /api/appointments` via the new `src/lib/apiClient.ts` (base URL from `VITE_API_URL`, see `.env.example`), instead of the old `setTimeout` stub.
+- `AppointmentForm.tsx`'s success message and fine-print disclaimer were updated (content only, not redesigned) because they used to claim "no appointment is booked on a server" — that's no longer true; submissions are now saved with `status: PENDING`.
+- The form's error toast now surfaces the backend's actual validation/error message instead of a generic one.
+
+The backend independently re-validates everything the frontend already validates — never assume the frontend's checks are sufficient on their own.
 
 ## Verification history
 

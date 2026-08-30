@@ -1,0 +1,88 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import request from "supertest";
+import { mockPrisma, resetPrismaMock } from "../mocks/prisma.mock";
+
+vi.mock("../../src/lib/prisma", () => ({ prisma: mockPrisma }));
+
+// Imported after the mock is registered so the app picks up the mocked client.
+import { createApp } from "../../src/app";
+
+function futureDate(daysAhead = 7): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + daysAhead);
+  return d.toISOString().slice(0, 10);
+}
+
+const validPayload = {
+  fullName: "Test Patient",
+  phone: "0300-1234567",
+  email: "patient@example.com",
+  preferredDate: futureDate(),
+  preferredTime: "10:30",
+  service: "Back & Neck Pain",
+  message: "Lower back pain for two weeks.",
+};
+
+describe("POST /api/appointments", () => {
+  const app = createApp();
+
+  beforeEach(() => {
+    resetPrismaMock();
+  });
+
+  it("accepts a valid appointment and creates it as PENDING", async () => {
+    mockPrisma.appointment.findFirst.mockResolvedValue(null); // slot free
+    mockPrisma.appointment.create.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ...validPayload,
+      status: "PENDING",
+    });
+
+    const res = await request(app).post("/api/appointments").send(validPayload);
+
+    expect(res.status).toBe(201);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.id).toBe("11111111-1111-1111-1111-111111111111");
+    expect(mockPrisma.appointment.create).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects an empty submission with field errors", async () => {
+    const res = await request(app).post("/api/appointments").send({});
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.errors.length).toBeGreaterThan(0);
+  });
+
+  it("rejects an invalid email", async () => {
+    const res = await request(app)
+      .post("/api/appointments")
+      .send({ ...validPayload, email: "not-an-email" });
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some((e: { path: string }) => e.path === "email")).toBe(true);
+  });
+
+  it("rejects a past date", async () => {
+    const res = await request(app)
+      .post("/api/appointments")
+      .send({ ...validPayload, preferredDate: "2000-01-01" });
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some((e: { path: string }) => e.path === "preferredDate")).toBe(true);
+  });
+
+  it("rejects an unknown service", async () => {
+    const res = await request(app)
+      .post("/api/appointments")
+      .send({ ...validPayload, service: "Not A Real Service" });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects a duplicate booking for an already-taken slot", async () => {
+    mockPrisma.appointment.findFirst.mockResolvedValue({ id: "existing" });
+
+    const res = await request(app).post("/api/appointments").send(validPayload);
+
+    expect(res.status).toBe(409);
+    expect(res.body.success).toBe(false);
+    expect(mockPrisma.appointment.create).not.toHaveBeenCalled();
+  });
+});

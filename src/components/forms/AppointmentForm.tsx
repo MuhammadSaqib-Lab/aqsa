@@ -76,9 +76,11 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
       setStatus("success");
       showToast("Appointment request received. We'll contact you shortly.");
       onSuccess?.();
-    } catch {
+    } catch (error) {
       setStatus("error");
-      showToast("Something went wrong. Please try again or call us directly.", "error");
+      const message =
+        error instanceof Error ? error.message : "Something went wrong. Please try again or call us directly.";
+      showToast(message, "error");
     }
   };
 
@@ -88,9 +90,9 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
         <CheckCircle2 className="h-14 w-14 text-accent" aria-hidden="true" />
         <h3 className="text-xl font-semibold text-primary-dark">Request Received</h3>
         <p className="max-w-sm text-sm text-text-muted">
-          Thank you, {values.fullName.split(" ")[0]}. This is a frontend demo — no
-          appointment has been booked on a server yet. Our team will reach out using
-          the contact details you provided once booking is connected.
+          Thank you, {values.fullName.split(" ")[0]}. Your request has been received
+          and is pending confirmation. Our team will contact you shortly using the
+          details you provided.
         </p>
         <Button
           type="button"
@@ -291,7 +293,8 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
         {status === "loading" ? "Submitting..." : "Request Appointment"}
       </Button>
       <p className="text-center text-xs text-text-soft">
-        This form is a frontend demo. No appointment is booked on a live server.
+        Submitting this form sends your request to our team for confirmation — it does
+        not book a guaranteed time slot.
       </p>
     </form>
   );

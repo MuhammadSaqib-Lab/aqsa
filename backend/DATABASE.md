@@ -25,17 +25,23 @@ psql -U postgres -c "CREATE DATABASE aqsa_physio;"
 
 # 2. Point Prisma at it
 cd backend
-cp .env.example .env   # then edit DATABASE_URL if it differs from the default
+cp .env.example .env   # then edit DATABASE_URL/DIRECT_URL if they differ from the default
 ```
 
-Default local connection string (matches a fresh `postgres`/`postgres` install):
+Default local connection string (matches a fresh `postgres`/`postgres` install) — `DATABASE_URL` and `DIRECT_URL` are the same value for local development:
 ```
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/aqsa_physio?schema=public"
+DIRECT_URL="postgresql://postgres:postgres@localhost:5432/aqsa_physio?schema=public"
 ```
 
 ## Environment
 
-`DATABASE_URL` is the only connection variable Prisma needs for a direct PostgreSQL connection (standard install, Docker, or most VPS/managed Postgres). A separate `DIRECT_URL` is **not** required for this setup — that variable only matters if you later move to a connection-pooled provider that needs a second, unpooled URL for running migrations (e.g. some serverless Postgres providers with PgBouncer in front). If you switch to one of those, add `DIRECT_URL` to both `.env.example` and `schema.prisma`'s `datasource` block at that point — not before, since an unused env var is just noise.
+Two connection variables:
+
+- **`DATABASE_URL`** — used by the running app (Prisma Client) for every query.
+- **`DIRECT_URL`** — used only by the Prisma CLI (`migrate`, `studio`), never at app runtime.
+
+For a plain local/Docker Postgres, both are the same value — there's no pooler in front, so there's nothing to distinguish. They start diverging once you deploy to a connection-pooled provider like **Neon** or **Supabase**: `DATABASE_URL` becomes the *pooled* (PgBouncer) connection string the app uses under normal load, while `DIRECT_URL` stays an *unpooled* connection, because running schema migrations through a transaction-mode pooler can fail or behave unexpectedly. See [../DEPLOYMENT.md](../DEPLOYMENT.md) for exactly which connection string goes where on Neon/Supabase.
 
 ## Migrations
 

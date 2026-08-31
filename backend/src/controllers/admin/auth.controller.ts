@@ -8,11 +8,18 @@ import { isProduction } from "../../config/env";
 
 const COOKIE_NAME = "admin_token";
 
+/**
+ * In production the frontend (Vercel) and backend (Render) are on different
+ * registrable domains — that's a cross-site request as far as cookies are
+ * concerned, even though it's still "our" frontend. Cross-site cookies
+ * require SameSite=None, which in turn requires Secure. "strict"/"lax"
+ * would silently stop the browser from ever sending the cookie back.
+ */
 function cookieOptions(): CookieOptions {
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? "strict" : "lax",
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
     path: "/",
   };

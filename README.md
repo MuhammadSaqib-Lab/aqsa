@@ -9,6 +9,8 @@ This repo has two independent projects:
 
 The frontend's appointment form submits to the backend at `VITE_API_URL` (see `.env.example`); everything else on the site is still static content, no auth or payments involved.
 
+For production deployment (Vercel + Render + Neon/Supabase), see [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## Features
 
 - Sticky, scroll-aware navigation with mobile drawer menu and active-section highlighting

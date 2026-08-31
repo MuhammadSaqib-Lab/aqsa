@@ -133,7 +133,7 @@ All responses use the same envelope:
 
 ## 11. Authentication
 
-JWT stored in an `httpOnly` cookie (`admin_token`) set on login — `secure` and `sameSite=strict` in production, `sameSite=lax` in development. A `Bearer` token in the `Authorization` header also works, for API testing/tools. Passwords are hashed with bcrypt (12 rounds); hashes are never returned in any response. Login is rate-limited (10 attempts / 15 min per IP) to slow brute-forcing.
+JWT stored in an `httpOnly` cookie (`admin_token`) set on login — `secure` and `sameSite=none` in production (frontend and backend are on different domains, so the cookie is cross-site as far as the browser is concerned), `sameSite=lax` in development. A `Bearer` token in the `Authorization` header also works, for API testing/tools. Passwords are hashed with bcrypt (12 rounds); hashes are never returned in any response. Login is rate-limited (10 attempts / 15 min per IP) to slow brute-forcing.
 
 ## 12. Connecting the frontend
 
@@ -147,14 +147,14 @@ In production, set it to the deployed backend's URL, and set this backend's `FRO
 
 ## 13. Deployment
 
-Works on any Node host that gives you a Postgres connection string (Railway, Render, Fly.io, a VPS, etc.):
+For the exact Neon/Supabase + Render + Vercel setup this project targets, see [../DEPLOYMENT.md](../DEPLOYMENT.md). Generic version, works on any Node host that gives you a Postgres connection string (Railway, Fly.io, a VPS, etc.):
 
-1. Provision PostgreSQL, set `DATABASE_URL`.
+1. Provision PostgreSQL, set `DATABASE_URL` (and `DIRECT_URL` if it's a pooled/serverless provider — see [DATABASE.md](DATABASE.md)).
 2. Set all required env vars (see `.env.example`) — especially `JWT_SECRET`, `FRONTEND_URL`, `NODE_ENV=production`.
-3. Build: `npm run build`.
+3. Build: `npm run build` (runs `prisma generate` automatically via `postinstall`).
 4. Run migrations against the production database: `npm run prisma:migrate:deploy`.
 5. Seed the first admin once: `npm run prisma:seed` (or create one manually — never leave default credentials in place).
-6. Start: `npm run start`. The app reads `PORT` from the platform's env.
+6. Start: `npm run start:prod` (runs `prisma migrate deploy` then starts the server — safe to use as the platform's start command so every deploy self-migrates) or plain `npm run start` if you'd rather run migrations as a separate step. The app reads `PORT` from the platform's env.
 
 Docker: `docker-compose.yml` includes both Postgres and the API for a self-contained deployment — `docker compose up -d` builds the image, waits for Postgres, runs migrations, and starts the server.
 

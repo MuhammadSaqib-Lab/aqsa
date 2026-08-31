@@ -4,6 +4,8 @@ Production-ready backend for the [Aqsa Physiotherapy Centre frontend](../README.
 
 This is a separate project from the frontend — it has its own `package.json`, `node_modules`, and lifecycle. Nothing here is imported by the frontend build; the two only talk over HTTP.
 
+See [DATABASE.md](DATABASE.md) for the database schema, migrations, seeding, backup strategy, and security notes in depth.
+
 ## 1. Requirements
 
 - Node.js 20+

@@ -68,6 +68,8 @@ Supabase free projects pause after a week of inactivity — you'll need to manua
 
    `npm run start:prod` runs `prisma migrate deploy` before starting the server, so every deploy automatically applies any new migrations. `postinstall` (already in `package.json`) runs `prisma generate` automatically after `npm install`.
 
+   **Root Directory is the setting people miss.** If it's left blank/`.`, Render builds and runs from the repo root — where there's a *frontend* `package.json` whose build never produces `dist/server.js` — and you'll see `Error: Cannot find module '/opt/render/project/src/dist/server.js'` (note: no `/backend/` in that path — that's the tell). If you'd rather this live in the repo instead of only in the dashboard, `render.yaml` at the repo root declares the same config as a Blueprint — use **New → Blueprint** instead of **New → Web Service** to pick it up automatically (a service already created manually via "Web Service" won't retroactively read it; fix Root Directory by hand for that one, or delete and recreate as a Blueprint).
+
 3. Environment variables (Render dashboard → Environment):
 
    | Key | Value |

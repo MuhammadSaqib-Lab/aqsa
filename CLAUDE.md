@@ -14,7 +14,7 @@ backend API. No payment system.
 
 - React 18 + TypeScript + Vite
 - Tailwind CSS v4 (via `@tailwindcss/vite`; theme tokens live in `src/index.css` under `:root` / `@theme inline`, not a `tailwind.config.js`)
-- React Router (single real route `/`; all in-page sections are anchor-linked; `*` renders `NotFound`)
+- React Router — public site at `/` (all in-page sections are anchor-linked), admin dashboard under `/admin/*`, `*` renders `NotFound`
 - lucide-react for icons
 
 ## Commands
@@ -27,7 +27,18 @@ npm run lint       # eslint .
 npm run preview   # preview the production build
 ```
 
-Last verified: `npm run build` compiles clean (no TS errors); `npm run lint` returns 0 errors (2 benign `react-refresh/only-export-components` warnings on `AppointmentContext.tsx` and `ToastContext.tsx`, expected for files exporting both a provider component and a hook).
+Last verified: `npm run build` compiles clean (no TS errors); `npm run lint` returns 0 errors (3 benign `react-refresh/only-export-components` warnings on `AppointmentContext.tsx`, `ToastContext.tsx`, and `AdminAuthContext.tsx`, expected for files exporting both a provider component and a hook).
+
+## Admin dashboard (`src/admin/`)
+
+Separate route tree, same app — `/admin/login` and `/admin/*` (dashboard home, appointments, messages), added as sibling `<Route>`s in `App.tsx` alongside the public `/` route (no public-site chrome — Navbar/Footer/etc. — renders there). Auth is a session cookie set by the backend (`GET /api/admin/auth/me` on load decides authenticated/unauthenticated; unauthenticated users are redirected to `/admin/login`).
+
+- `admin/api/adminApi.ts` — thin wrapper over the same `lib/apiClient.ts` used by the public site; no duplicate fetch logic.
+- `admin/context/AdminAuthContext.tsx` — session state (`loading`/`authenticated`/`unauthenticated`), `login()`/`logout()`.
+- `admin/components/` — `AdminLayout` (sidebar + topbar shell, responsive mobile drawer), `ProtectedAdminRoute`, `AppointmentDetailModal` / `MessageDetailModal` (status actions, admin notes, delete), `StatusBadge`, `Pagination`, `ConfirmDialog`, `EmptyState`/`LoadingBlock`/`ErrorBlock`.
+- `admin/pages/` — `AdminLoginPage`, `DashboardHomePage` (live counts from `GET /api/admin/dashboard`), `AppointmentsPage`, `MessagesPage` (both paginated, filterable, searchable — search is debounced via `hooks/useDebouncedValue.ts`).
+- All data is real — every number/row comes from PostgreSQL through the existing `backend/` admin API. No mock/fake dashboard data.
+- `components/ui/Modal.tsx` gained an optional `maxWidthClassName` prop (default unchanged, `max-w-lg`) so admin detail modals can be wider — backward compatible with the existing appointment-booking modal.
 
 ## Full project structure
 

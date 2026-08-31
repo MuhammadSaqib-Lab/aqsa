@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { ScrollProgressBar } from "./components/layout/ScrollProgressBar";
@@ -9,6 +9,13 @@ import { ToastProvider } from "./context/ToastContext";
 import { AppointmentProvider } from "./context/AppointmentContext";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import { AdminAuthProvider } from "./admin/context/AdminAuthContext";
+import { ProtectedAdminRoute } from "./admin/components/ProtectedAdminRoute";
+import { AdminLayout } from "./admin/components/AdminLayout";
+import { AdminLoginPage } from "./admin/pages/AdminLoginPage";
+import { DashboardHomePage } from "./admin/pages/DashboardHomePage";
+import { AppointmentsPage } from "./admin/pages/AppointmentsPage";
+import { MessagesPage } from "./admin/pages/MessagesPage";
 
 export default function App() {
   return (
@@ -31,6 +38,23 @@ export default function App() {
               </>
             }
           />
+
+          <Route element={<AdminAuthProvider><Outlet /></AdminAuthProvider>}>
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedAdminRoute>
+                  <AdminLayout />
+                </ProtectedAdminRoute>
+              }
+            >
+              <Route index element={<DashboardHomePage />} />
+              <Route path="appointments" element={<AppointmentsPage />} />
+              <Route path="messages" element={<MessagesPage />} />
+            </Route>
+          </Route>
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AppointmentProvider>

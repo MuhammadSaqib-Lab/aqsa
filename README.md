@@ -18,6 +18,7 @@ The frontend's appointment form submits to the backend at `VITE_API_URL` (see `.
 - Contact section with phone/WhatsApp/email/address, hours, and a map embed
 - Scroll progress bar, back-to-top button, floating WhatsApp button, mobile bottom appointment bar
 - Custom 404 page
+- Admin dashboard (`/admin`) — secure login, live appointment/contact stats, appointment and message management with search/filter/pagination
 - Scroll-reveal animations that respect `prefers-reduced-motion`
 - Fully responsive (mobile, tablet, laptop, desktop)
 

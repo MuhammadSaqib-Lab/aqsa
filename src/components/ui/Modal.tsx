@@ -7,9 +7,10 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
+  maxWidthClassName?: string;
 }
 
-export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, maxWidthClassName = "max-w-lg" }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useLockBodyScroll(isOpen);
 
@@ -44,7 +45,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         aria-modal="true"
         aria-labelledby="modal-title"
         tabIndex={-1}
-        className="animate-fade-up relative z-10 my-8 w-full max-w-lg rounded-3xl bg-white p-6 shadow-lift outline-none sm:p-8"
+        className={`animate-fade-up relative z-10 my-8 w-full ${maxWidthClassName} rounded-3xl bg-white p-6 shadow-lift outline-none sm:p-8`}
       >
         <div className="mb-6 flex items-start justify-between gap-4">
           <h2 id="modal-title" className="text-2xl font-semibold text-primary-dark">

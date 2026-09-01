@@ -16,15 +16,15 @@ export function About() {
     <section id="about" className="bg-white py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <Reveal className="relative mx-auto w-full max-w-md lg:max-w-none">
+          <Reveal className="relative mx-auto w-full max-w-md lg:max-w-lg">
             <div className="aspect-[4/5] w-full overflow-hidden rounded-[2rem] shadow-lift">
               <img
                 src="/images/clinic-band-exercise.jpg"
                 alt="Physiotherapist at Aqsa Physiotherapy Centre guiding a patient through resistance band exercise therapy"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover object-center"
                 loading="lazy"
-                width={800}
-                height={1000}
+                width={420}
+                height={320}
               />
             </div>
             <div className="absolute -bottom-6 -right-4 hidden w-52 rounded-2xl border border-border bg-white p-4 shadow-lift sm:block">

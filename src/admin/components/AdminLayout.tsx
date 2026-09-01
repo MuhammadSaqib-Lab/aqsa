@@ -55,7 +55,7 @@ export function AdminLayout() {
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
-          <img src="/images/logo.png" alt="" className="h-8 w-8 rounded-full" />
+          <img src="/images/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
           <span className="font-display text-lg font-semibold text-primary-dark">Admin Dashboard</span>
         </div>
         <div className="flex items-center gap-4">

@@ -79,14 +79,14 @@ export function Hero() {
           </Reveal>
         </div>
 
-        <Reveal delay={200} className="relative mx-auto w-full max-w-md lg:max-w-none">
+        <Reveal delay={200} className="relative mx-auto w-full max-w-md lg:max-w-lg">
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] shadow-lift sm:aspect-[5/5.5]">
             <img
               src="/images/clinic-manual-therapy.jpg"
               alt="Physiotherapist providing hands-on back therapy to a patient at Aqsa Physiotherapy Centre"
-              className="h-full w-full object-cover"
-              width={800}
-              height={880}
+              className="h-full w-full object-cover object-center"
+              width={420}
+              height={320}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/40 via-transparent to-transparent" />
           </div>

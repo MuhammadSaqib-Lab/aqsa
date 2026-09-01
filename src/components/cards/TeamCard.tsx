@@ -17,9 +17,10 @@ export function TeamCard({ member, delay = 0 }: TeamCardProps) {
         src={member.image}
         alt={`Portrait of ${member.name}`}
         loading="lazy"
-        width={200}
-        height={240}
-        className="h-56 w-full object-cover sm:h-auto sm:w-48"
+        decoding="async"
+        width={600}
+        height={600}
+        className="aspect-square w-full shrink-0 object-cover object-top sm:aspect-auto sm:h-auto sm:w-48"
       />
       <div className="flex flex-1 flex-col gap-3 p-6">
         <div>

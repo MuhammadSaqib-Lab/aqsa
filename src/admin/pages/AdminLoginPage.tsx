@@ -33,7 +33,7 @@ export function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-bg-subtle px-4">
       <div className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-card">
         <div className="mb-6 flex flex-col items-center text-center">
-          <img src="/images/logo.png" alt="" className="mb-3 h-12 w-12 rounded-full" />
+          <img src="/images/logo.png" alt="" width={48} height={48} className="mb-3 h-12 w-12 rounded-full object-cover" />
           <h1 className="font-display text-xl font-semibold text-primary-dark">Admin Login</h1>
           <p className="mt-1 text-sm text-text-soft">Aqsa Physiotherapy Centre</p>
         </div>

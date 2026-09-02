@@ -8,6 +8,7 @@ import { env, isProduction, allowedOrigins } from "./config/env";
 import { logger } from "./config/logger";
 import { generalLimiter } from "./middleware/rateLimiters";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
+import { ApiError } from "./utils/ApiError";
 import { openApiDocument } from "./docs/openapi";
 import apiRoutes from "./routes";
 
@@ -23,7 +24,7 @@ export function createApp() {
       origin(origin, callback) {
         // Same-origin/non-browser requests (no Origin header) are allowed through.
         if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-        callback(new Error("Not allowed by CORS"));
+        callback(ApiError.forbidden(`Origin "${origin}" is not allowed by CORS`));
       },
       credentials: true,
     })

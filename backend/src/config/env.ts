@@ -45,5 +45,23 @@ export const env = parsed.data;
 export const isProduction = env.NODE_ENV === "production";
 export const isTest = env.NODE_ENV === "test";
 
+/**
+ * Recovers a plain origin from a value someone pasted as a rendered markdown
+ * link — `[https://example.com](https://example.com)` — instead of the bare
+ * URL. This has repeatedly been how FRONTEND_URL/VITE_API_URL get
+ * misconfigured in practice, so this is deliberately defensive rather than
+ * assuming operators will always paste clean values. Also strips a trailing
+ * slash so origin comparisons ("https://x.com" vs "https://x.com/") don't
+ * fail on that alone.
+ */
+export function sanitizeOrigin(raw: string): string {
+  const trimmed = raw.trim();
+  const markdownLink = trimmed.match(/^\[(https?:\/\/[^\]]+)\]\(https?:\/\/[^)]+\)$/);
+  const url = markdownLink ? markdownLink[1] : trimmed;
+  return url.replace(/\/$/, "");
+}
+
 /** Comma-separated FRONTEND_URL supports multiple allowed origins. */
-export const allowedOrigins = env.FRONTEND_URL.split(",").map((s) => s.trim()).filter(Boolean);
+export const allowedOrigins = env.FRONTEND_URL.split(",")
+  .map((s) => sanitizeOrigin(s))
+  .filter(Boolean);

@@ -16,6 +16,13 @@ import { AdminLoginPage } from "./admin/pages/AdminLoginPage";
 import { DashboardHomePage } from "./admin/pages/DashboardHomePage";
 import { AppointmentsPage } from "./admin/pages/AppointmentsPage";
 import { MessagesPage } from "./admin/pages/MessagesPage";
+import { PatientAuthProvider } from "./patient/context/PatientAuthContext";
+import { ProtectedPatientRoute } from "./patient/components/ProtectedPatientRoute";
+import { PatientLayout } from "./patient/components/PatientLayout";
+import { PatientLoginPage } from "./patient/pages/PatientLoginPage";
+import { PatientSignupPage } from "./patient/pages/PatientSignupPage";
+import { PatientDashboardPage } from "./patient/pages/PatientDashboardPage";
+import { NewAppointmentPage } from "./patient/pages/NewAppointmentPage";
 
 export default function App() {
   return (
@@ -52,6 +59,22 @@ export default function App() {
               <Route index element={<DashboardHomePage />} />
               <Route path="appointments" element={<AppointmentsPage />} />
               <Route path="messages" element={<MessagesPage />} />
+            </Route>
+          </Route>
+
+          <Route element={<PatientAuthProvider><Outlet /></PatientAuthProvider>}>
+            <Route path="/patient/login" element={<PatientLoginPage />} />
+            <Route path="/patient/signup" element={<PatientSignupPage />} />
+            <Route
+              path="/patient"
+              element={
+                <ProtectedPatientRoute>
+                  <PatientLayout />
+                </ProtectedPatientRoute>
+              }
+            >
+              <Route index element={<PatientDashboardPage />} />
+              <Route path="new-appointment" element={<NewAppointmentPage />} />
             </Route>
           </Route>
 

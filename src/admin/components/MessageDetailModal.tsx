@@ -5,7 +5,7 @@ import { useToast } from "../../context/ToastContext";
 import * as adminApi from "../api/adminApi";
 import { ApiRequestError } from "../../lib/apiClient";
 import type { AdminContactMessage, ContactStatus } from "../types";
-import { StatusBadge } from "./StatusBadge";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { formatDateTime } from "../utils/format";
 import { ConfirmDialog } from "./ConfirmDialog";
 

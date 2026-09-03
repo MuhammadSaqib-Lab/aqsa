@@ -14,6 +14,7 @@ function model() {
 
 export const mockPrisma = {
   adminUser: model(),
+  patient: model(),
   appointment: model(),
   contactMessage: model(),
   $transaction: vi.fn(async (arg: unknown) => {

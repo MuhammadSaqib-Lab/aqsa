@@ -93,6 +93,36 @@ export function notifyPatientOfAppointmentReceived(details: {
   });
 }
 
+const STATUS_MESSAGES: Record<string, string> = {
+  PENDING: "is pending review.",
+  CONFIRMED: "has been confirmed.",
+  COMPLETED: "has been marked as completed.",
+  CANCELLED: "has been cancelled.",
+  NO_SHOW: "was marked as a no-show.",
+};
+
+export function notifyPatientOfStatusChange(details: {
+  patientEmail: string;
+  patientName: string;
+  status: string;
+  preferredDate: string;
+  preferredTime: string;
+}): void {
+  const statusText = STATUS_MESSAGES[details.status] ?? `is now "${details.status}".`;
+  void sendMail({
+    to: details.patientEmail,
+    subject: "Update on your appointment — Aqsa Physiotherapy Centre",
+    text: [
+      `Hi ${details.patientName},`,
+      "",
+      `Your appointment for ${details.preferredDate} at ${details.preferredTime} ${statusText}`,
+      "Log into your patient portal for the latest details, or call us if you have any questions.",
+      "",
+      "Aqsa Physiotherapy Centre",
+    ].join("\n"),
+  });
+}
+
 export function notifyClinicOfNewContactMessage(details: {
   name: string;
   phone?: string | null;

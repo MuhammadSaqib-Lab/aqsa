@@ -1,6 +1,5 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
-import { Modal } from "../components/ui/Modal";
-import { AppointmentForm } from "../components/forms/AppointmentForm";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface AppointmentContextValue {
   openAppointment: () => void;
@@ -8,22 +7,23 @@ interface AppointmentContextValue {
 
 const AppointmentContext = createContext<AppointmentContextValue | undefined>(undefined);
 
+/**
+ * Booking now requires a patient account — this used to open a modal
+ * directly; it now sends visitors to the booking page inside the patient
+ * portal, which redirects to login/signup first if they aren't already
+ * signed in (see ProtectedPatientRoute). Kept as the same openAppointment()
+ * hook shape so none of its call sites (Navbar, Hero, AppointmentCTA,
+ * MobileAppointmentBar, MobileMenu) need to change.
+ */
 export function AppointmentProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   const value = useMemo<AppointmentContextValue>(
-    () => ({ openAppointment: () => setIsOpen(true) }),
-    []
+    () => ({ openAppointment: () => navigate("/patient/new-appointment") }),
+    [navigate]
   );
 
-  return (
-    <AppointmentContext.Provider value={value}>
-      {children}
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="Book an Appointment">
-        <AppointmentForm onSuccess={() => undefined} />
-      </Modal>
-    </AppointmentContext.Provider>
-  );
+  return <AppointmentContext.Provider value={value}>{children}</AppointmentContext.Provider>;
 }
 
 export function useAppointment(): AppointmentContextValue {

@@ -1,27 +1,17 @@
 import { useState, type FormEvent } from "react";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 import { services } from "../../config/clinic";
-import { submitAppointmentRequest } from "../../lib/appointmentApi";
+import * as patientApi from "../../patient/api/patientApi";
+import { usePatientAuth } from "../../patient/context/PatientAuthContext";
 import { useToast } from "../../context/ToastContext";
-import type { AppointmentFormValues } from "../../types";
+import type { PatientAppointmentFormValues } from "../../patient/types";
 import { Button } from "../ui/Button";
 
-const initialValues: AppointmentFormValues = {
-  fullName: "",
-  phone: "",
-  email: "",
-  preferredDate: "",
-  preferredTime: "",
-  service: "",
-  message: "",
-};
-
-type Errors = Partial<Record<keyof AppointmentFormValues, string>>;
+type Errors = Partial<Record<keyof PatientAppointmentFormValues, string>>;
 
 const PHONE_PATTERN = /^[0-9+\-\s()]{7,20}$/;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function validate(values: AppointmentFormValues): Errors {
+function validate(values: PatientAppointmentFormValues): Errors {
   const errors: Errors = {};
 
   if (!values.fullName.trim()) errors.fullName = "Please enter your full name.";
@@ -29,10 +19,6 @@ function validate(values: AppointmentFormValues): Errors {
 
   if (!values.phone.trim()) errors.phone = "Please enter a phone number.";
   else if (!PHONE_PATTERN.test(values.phone.trim())) errors.phone = "Please enter a valid phone number.";
-
-  if (values.email.trim() && !EMAIL_PATTERN.test(values.email.trim())) {
-    errors.email = "Please enter a valid email address.";
-  }
 
   if (!values.preferredDate) errors.preferredDate = "Please choose a preferred date.";
   else {
@@ -54,12 +40,21 @@ interface AppointmentFormProps {
 }
 
 export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
-  const [values, setValues] = useState<AppointmentFormValues>(initialValues);
+  const { patient } = usePatientAuth();
+  const initialValues: PatientAppointmentFormValues = {
+    fullName: patient?.name ?? "",
+    phone: patient?.phone ?? "",
+    preferredDate: "",
+    preferredTime: "",
+    service: "",
+    message: "",
+  };
+  const [values, setValues] = useState<PatientAppointmentFormValues>(initialValues);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const { showToast } = useToast();
 
-  const updateField = <K extends keyof AppointmentFormValues>(field: K, value: string) => {
+  const updateField = <K extends keyof PatientAppointmentFormValues>(field: K, value: string) => {
     setValues((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
@@ -72,7 +67,7 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
 
     setStatus("loading");
     try {
-      await submitAppointmentRequest(values);
+      await patientApi.createAppointment(values);
       setStatus("success");
       showToast("Appointment request received. We'll contact you shortly.");
       onSuccess?.();
@@ -91,8 +86,8 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
         <h3 className="text-xl font-semibold text-primary-dark">Request Received</h3>
         <p className="max-w-sm text-sm text-text-muted">
           Thank you, {values.fullName.split(" ")[0]}. Your request has been received
-          and is pending confirmation. Our team will contact you shortly using the
-          details you provided.
+          and is pending confirmation. You can track its status any time from your
+          patient portal, and we'll also email you at {patient?.email} when it updates.
         </p>
         <Button
           type="button"
@@ -108,7 +103,7 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
     );
   }
 
-  const inputClasses = (field: keyof AppointmentFormValues) =>
+  const inputClasses = (field: keyof PatientAppointmentFormValues) =>
     `w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-text transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 ${
       errors[field] ? "border-red-400" : "border-border focus:border-accent"
     }`;
@@ -160,28 +155,6 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
             </p>
           )}
         </div>
-      </div>
-
-      <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text">
-          Email <span className="text-text-soft">(optional)</span>
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          value={values.email}
-          onChange={(e) => updateField("email", e.target.value)}
-          className={inputClasses("email")}
-          aria-invalid={Boolean(errors.email)}
-          aria-describedby={errors.email ? "email-error" : undefined}
-        />
-        {errors.email && (
-          <p id="email-error" className="mt-1 text-xs text-red-500">
-            {errors.email}
-          </p>
-        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -294,7 +267,8 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
       </Button>
       <p className="text-center text-xs text-text-soft">
         Submitting this form sends your request to our team for confirmation — it does
-        not book a guaranteed time slot.
+        not book a guaranteed time slot. We'll notify you at {patient?.email} when your
+        status changes.
       </p>
     </form>
   );

@@ -1,5 +1,5 @@
-export type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
-export type ContactStatus = "NEW" | "READ" | "REPLIED" | "ARCHIVED";
+export type { AppointmentStatus, ContactStatus } from "../types";
+import type { AppointmentStatus, ContactStatus } from "../types";
 
 export interface AdminProfile {
   id: string;

@@ -48,6 +48,8 @@ model AdminUser {
 
 model Appointment {
   id            String            @id @default(uuid()) @db.Uuid
+  patientId     String?           @db.Uuid
+  patient       Patient?          @relation(fields: [patientId], references: [id], onDelete: SetNull)
   patientName   String
   phone         String
   email         String?
@@ -66,7 +68,24 @@ model Appointment {
   @@index([email])
   @@index([createdAt])
   @@index([preferredDate, preferredTime])
+  @@index([patientId])
   @@map("appointments")
+}
+
+model Patient {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String
+  email        String    @unique
+  phone        String?
+  passwordHash String
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLoginAt  DateTime?
+
+  appointments Appointment[]
+
+  @@map("patients")
 }
 
 model ContactMessage {

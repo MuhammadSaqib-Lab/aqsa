@@ -3,10 +3,17 @@ import { createAppointment, getAvailability } from "../controllers/appointment.c
 import { validate } from "../middleware/validate";
 import { createAppointmentSchema, availabilityQuerySchema } from "../validators/appointment.validators";
 import { appointmentSubmissionLimiter } from "../middleware/rateLimiters";
+import { authenticatePatient } from "../middleware/patientAuth";
 
 const router = Router();
 
-router.post("/", appointmentSubmissionLimiter, validate(createAppointmentSchema), createAppointment);
+router.post(
+  "/",
+  authenticatePatient,
+  appointmentSubmissionLimiter,
+  validate(createAppointmentSchema),
+  createAppointment
+);
 router.get("/availability", validate(availabilityQuerySchema, "query"), getAvailability);
 
 export default router;

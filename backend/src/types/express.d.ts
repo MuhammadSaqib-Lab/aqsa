@@ -8,6 +8,11 @@ declare global {
         email: string;
         role: AdminRole;
       };
+      patient?: {
+        id: string;
+        email: string;
+        name: string;
+      };
     }
   }
 }

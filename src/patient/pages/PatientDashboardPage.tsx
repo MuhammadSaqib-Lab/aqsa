@@ -1,0 +1,103 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { CalendarClock, Plus } from "lucide-react";
+import * as patientApi from "../api/patientApi";
+import { ApiRequestError } from "../../lib/apiClient";
+import type { PatientAppointment, Paginated } from "../types";
+import { LoadingBlock } from "../../admin/components/LoadingBlock";
+import { ErrorBlock } from "../../admin/components/ErrorBlock";
+import { EmptyState } from "../../admin/components/EmptyState";
+import { Pagination } from "../../admin/components/Pagination";
+import { StatusBadge } from "../../components/ui/StatusBadge";
+import { formatDateOnly, formatDateTime } from "../../admin/utils/format";
+
+const LIMIT = 10;
+
+export function PatientDashboardPage() {
+  const [page, setPage] = useState(1);
+  const [result, setResult] = useState<Paginated<PatientAppointment> | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = () => {
+    setIsLoading(true);
+    setError(null);
+    patientApi
+      .listMyAppointments({ page, limit: LIMIT })
+      .then(setResult)
+      .catch((err) => setError(err instanceof ApiRequestError ? err.message : "Failed to load your appointments."))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(load, [page]);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-primary-dark">My Appointments</h1>
+          <p className="mt-1 text-sm text-text-soft">Track the status of your appointment requests.</p>
+        </div>
+        <Link
+          to="/patient/new-appointment"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary-dark active:translate-y-0"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Book an Appointment
+        </Link>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-soft">
+        {isLoading ? (
+          <LoadingBlock label="Loading your appointments…" />
+        ) : error ? (
+          <ErrorBlock message={error} onRetry={load} />
+        ) : !result || result.items.length === 0 ? (
+          <EmptyState
+            icon={CalendarClock}
+            title="No appointments yet"
+            description="Once you book an appointment, it will show up here with its live status."
+          />
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border bg-bg-subtle text-xs uppercase tracking-wide text-text-soft">
+                  <tr>
+                    <th className="px-4 py-3 font-medium sm:px-6">Date &amp; Time</th>
+                    <th className="px-4 py-3 font-medium sm:px-6">Service</th>
+                    <th className="px-4 py-3 font-medium sm:px-6">Requested</th>
+                    <th className="px-4 py-3 font-medium sm:px-6">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {result.items.map((appointment) => (
+                    <tr key={appointment.id}>
+                      <td className="px-4 py-3.5 font-medium text-text sm:px-6">
+                        {formatDateOnly(appointment.preferredDate)} · {appointment.preferredTime}
+                      </td>
+                      <td className="px-4 py-3.5 text-text-muted sm:px-6">{appointment.service}</td>
+                      <td className="px-4 py-3.5 text-text-muted sm:px-6">{formatDateTime(appointment.createdAt)}</td>
+                      <td className="px-4 py-3.5 sm:px-6">
+                        <StatusBadge status={appointment.status} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <Pagination meta={result.pagination} onPageChange={setPage} />
+          </>
+        )}
+      </div>
+
+      <p className="text-center text-sm text-text-soft">
+        Questions about a request?{" "}
+        <Link to="/#contact" className="font-medium text-primary hover:underline">
+          Contact the clinic
+        </Link>
+        .
+      </p>
+    </div>
+  );
+}

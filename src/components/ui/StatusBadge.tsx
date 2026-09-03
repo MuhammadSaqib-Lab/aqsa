@@ -1,4 +1,4 @@
-import type { AppointmentStatus, ContactStatus } from "../types";
+import type { AppointmentStatus, ContactStatus } from "../../types";
 
 const appointmentStyles: Record<AppointmentStatus, string> = {
   PENDING: "bg-amber-50 text-amber-700 ring-amber-600/20",

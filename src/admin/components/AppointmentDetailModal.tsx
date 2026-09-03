@@ -6,7 +6,7 @@ import { useToast } from "../../context/ToastContext";
 import * as adminApi from "../api/adminApi";
 import { ApiRequestError } from "../../lib/apiClient";
 import type { AdminAppointment, AppointmentStatus } from "../types";
-import { StatusBadge } from "./StatusBadge";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { formatDateOnly, formatDateTime } from "../utils/format";
 
 interface AppointmentDetailModalProps {

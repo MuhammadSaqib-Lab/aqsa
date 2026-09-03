@@ -7,7 +7,7 @@ import { LoadingBlock } from "../components/LoadingBlock";
 import { ErrorBlock } from "../components/ErrorBlock";
 import { EmptyState } from "../components/EmptyState";
 import { Pagination } from "../components/Pagination";
-import { StatusBadge } from "../components/StatusBadge";
+import { StatusBadge } from "../../components/ui/StatusBadge";
 import { AppointmentDetailModal } from "../components/AppointmentDetailModal";
 import { formatDateOnly } from "../utils/format";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";

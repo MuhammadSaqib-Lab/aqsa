@@ -44,3 +44,22 @@ export const loginLimiter = rateLimit({
   skipSuccessfulRequests: true,
   handler: jsonHandler("Too many login attempts. Please try again later."),
 });
+
+/** Patient signup — deter spam account creation. */
+export const patientSignupLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: jsonHandler("Too many accounts created from this device. Please try again later."),
+});
+
+/** Patient login — brute-force protection, same shape as the admin one. */
+export const patientLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  handler: jsonHandler("Too many login attempts. Please try again later."),
+});

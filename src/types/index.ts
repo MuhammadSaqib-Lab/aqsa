@@ -1,5 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 
+export type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+export type ContactStatus = "NEW" | "READ" | "REPLIED" | "ARCHIVED";
+
 export interface NavLink {
   label: string;
   href: string;

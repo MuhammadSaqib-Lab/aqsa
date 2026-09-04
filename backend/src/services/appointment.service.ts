@@ -1,6 +1,7 @@
 import type { Appointment, AppointmentStatus, Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 import { ApiError } from "../utils/ApiError";
+import { logger } from "../config/logger";
 import { buildPaginationMeta, toSkipTake } from "../utils/pagination";
 import type { PaginatedData } from "../types/api";
 import type { CreateAppointmentInput } from "../validators/appointment.validators";
@@ -23,6 +24,10 @@ export async function createAppointment(
 ): Promise<Appointment> {
   const taken = await isSlotTaken(input.preferredDate, input.preferredTime);
   if (taken) {
+    logger.warn(
+      { patientId: patient.id, preferredDate: input.preferredDate, preferredTime: input.preferredTime },
+      "Appointment creation rejected — slot already taken"
+    );
     throw ApiError.conflict(
       "This time slot is already booked. Please choose a different date or time."
     );
@@ -40,6 +45,7 @@ export async function createAppointment(
       message: input.message || null,
     },
   });
+  logger.info({ appointmentId: appointment.id, patientId: patient.id }, "Appointment record created — dispatching notifications");
 
   notifyClinicOfNewAppointment({
     patientName: appointment.patientName,

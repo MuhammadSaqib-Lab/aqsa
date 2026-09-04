@@ -44,17 +44,26 @@ interface RequestOptions {
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const method = options.method ?? "GET";
+  const url = `${API_URL}${path}`;
+
+  // Traces every call from the browser console — the fastest way to tell
+  // "never left the browser" (network error below) apart from "backend
+  // rejected it" (a logged non-2xx) apart from "never even reached fetch()"
+  // (nothing logged at all, meaning a JS error happened before this ran).
+  console.log(`[apiClient] → ${method} ${url}`);
 
   let response: Response;
   try {
-    response = await fetch(`${API_URL}${path}`, {
-      method: options.method ?? "GET",
+    response = await fetch(url, {
+      method,
       headers: options.body ? { "Content-Type": "application/json" } : undefined,
       body: options.body ? JSON.stringify(options.body) : undefined,
       credentials: "include",
       signal: controller.signal,
     });
   } catch (error) {
+    console.error(`[apiClient] ✗ ${method} ${url} — request never reached the server`, error);
     if ((error as Error).name === "AbortError") {
       throw new ApiRequestError("The request timed out. Please check your connection and try again.", 0);
     }
@@ -67,8 +76,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   if (!response.ok || !payload?.success) {
     const message = payload?.message ?? "Something went wrong. Please try again.";
+    console.error(`[apiClient] ✗ ${method} ${url} — ${response.status} ${message}`);
     throw new ApiRequestError(message, response.status, payload && !payload.success ? payload.errors : undefined);
   }
 
+  console.log(`[apiClient] ✓ ${method} ${url} — ${response.status}`);
   return payload.data;
 }

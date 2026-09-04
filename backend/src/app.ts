@@ -33,7 +33,11 @@ export function createApp() {
   app.use(express.json({ limit: "20kb" }));
   app.use(express.urlencoded({ extended: true, limit: "20kb" }));
   app.use(cookieParser());
-  app.use(pinoHttp({ logger, autoLogging: !isProduction }));
+  // autoLogging was previously disabled in production to reduce noise, but
+  // that meant a fully successful request left zero trace in Render's logs —
+  // making "is the frontend even reaching the backend?" impossible to answer
+  // from logs alone. Every request is now logged in every environment.
+  app.use(pinoHttp({ logger }));
 
   app.use("/api", generalLimiter);
 

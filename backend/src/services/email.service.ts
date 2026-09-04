@@ -33,14 +33,28 @@ interface SendMailInput {
 export async function sendMail({ to, subject, text }: SendMailInput): Promise<void> {
   const client = getTransporter();
   if (!client) {
-    logger.info({ to, subject }, "Email skipped — SMTP not configured");
+    logger.warn(
+      { to, subject },
+      "Email skipped — SMTP_HOST is not set. Configure SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD to enable email notifications."
+    );
     return;
   }
   try {
-    await client.sendMail({ from: env.EMAIL_FROM || env.SMTP_USER, to, subject, text });
-    logger.info({ to, subject }, "Email sent");
+    const info = await client.sendMail({ from: env.EMAIL_FROM || env.SMTP_USER, to, subject, text });
+    logger.info({ to, subject, messageId: info.messageId }, "Email sent");
   } catch (err) {
-    logger.error({ err, to, subject }, "Email send failed");
+    const smtpErr = err as { code?: string; responseCode?: number; command?: string; message?: string };
+    logger.error(
+      {
+        to,
+        subject,
+        errorCode: smtpErr.code,
+        smtpResponseCode: smtpErr.responseCode,
+        smtpCommand: smtpErr.command,
+        errorMessage: smtpErr.message,
+      },
+      "Email send failed"
+    );
   }
 }
 

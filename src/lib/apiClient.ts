@@ -4,8 +4,22 @@
  * headers, timeouts, and error handling stay in one place.
  */
 
-const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") ?? "/api";
+const rawApiUrl = import.meta.env.VITE_API_URL as string | undefined;
+const API_URL = rawApiUrl?.replace(/\/$/, "") ?? "/api";
 const DEFAULT_TIMEOUT_MS = 10_000;
+
+if (!rawApiUrl) {
+  // Falling back to a same-origin relative path silently sends every API call
+  // nowhere useful when the backend lives on a different domain (Render vs
+  // Vercel) — surface it loudly instead of leaving requests to fail with no
+  // trace in the backend's logs.
+  console.warn(
+    `[apiClient] VITE_API_URL is not set — falling back to relative "${API_URL}", which only reaches a backend ` +
+      "hosted on this same origin. If API calls aren't reaching the backend, set VITE_API_URL " +
+      "(e.g. https://your-backend.onrender.com/api) in your hosting provider's build environment variables " +
+      "and trigger a fresh build."
+  );
+}
 
 interface ApiSuccess<T> {
   success: true;

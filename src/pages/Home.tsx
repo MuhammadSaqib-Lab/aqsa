@@ -17,10 +17,10 @@ export default function Home() {
     <>
       <Hero />
       <About />
+      <FemalePhysiotherapy />
       <Services />
       <Conditions />
       <Equipment />
-      <FemalePhysiotherapy />
       <WhyChooseUs />
       <Process />
       <Testimonials />

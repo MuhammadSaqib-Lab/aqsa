@@ -45,7 +45,7 @@ Then fill in `.env`. See `.env.example` for the full list with comments; the ess
 | `JWT_SECRET` | Long random string signing admin sessions — generate with `openssl rand -hex 32` |
 | `FRONTEND_URL` | Exact origin(s) allowed by CORS, comma-separated |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Used once by the seed script to create the first admin account |
-| `SMTP_*` / `CLINIC_NOTIFICATION_EMAIL` | Optional — leave blank to disable email notifications entirely |
+| `RESEND_API_KEY` / `EMAIL_FROM` / `CLINIC_NOTIFICATION_EMAIL` | Optional — leave blank to disable email notifications entirely |
 | `CLINIC_*` | Clinic hours/timezone used by the availability endpoint — placeholders, see [../CLAUDE.md](../CLAUDE.md) |
 
 Never commit `.env`. `.gitignore` already excludes it.
@@ -214,5 +214,5 @@ backend/
 
 - **Real WhatsApp integration:** not built — the frontend's WhatsApp button stays a plain link (`wa.me`), per the brief. If official WhatsApp Business API integration is wanted later, it should be a new service module here (`services/whatsapp.service.ts`) called the same way `email.service.ts` is — never build unofficial automation against personal WhatsApp.
 - **Admin dashboard UI:** this API is ready to support one (`/admin/dashboard`, paginated list endpoints, status updates) — no frontend for it exists yet.
-- **Production email:** currently a `nodemailer` abstraction that no-ops if `SMTP_HOST` is unset. Point it at a real provider (SES, Postmark, SendGrid SMTP, etc.) via the `SMTP_*` env vars when ready.
+- **Production email:** sends via the [Resend](https://resend.com) HTTPS API (`services/email.service.ts`), which no-ops if `RESEND_API_KEY` is unset. Deliberately not SMTP — Render blocks/restricts outbound SMTP ports, which made an earlier Nodemailer+SMTP transport time out in production.
 - **Confirmed clinic hours:** the availability endpoint uses the `CLINIC_*` env vars, currently set to the same placeholder hours as the frontend (see `../CLAUDE.md`) — update them once the clinic confirms real hours.

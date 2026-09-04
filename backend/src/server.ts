@@ -7,26 +7,20 @@ const app = createApp();
 
 const server = app.listen(env.PORT, () => {
   logger.info(`Aqsa Physiotherapy Centre API listening on port ${env.PORT} (${env.NODE_ENV})`);
-  if (env.SMTP_HOST) {
-    logger.info(
-      { smtpHost: env.SMTP_HOST, smtpPort: env.SMTP_PORT, emailFrom: env.EMAIL_FROM || env.SMTP_USER },
-      "Email notifications ENABLED"
-    );
+  if (env.RESEND_API_KEY && env.EMAIL_FROM) {
+    logger.info({ emailFrom: env.EMAIL_FROM }, "Email notifications ENABLED (Resend API)");
   } else {
     // Log presence (not values) of each related var so a misnamed/blank key
     // in the hosting provider's dashboard is visible without exposing secrets.
     logger.warn(
       {
-        SMTP_HOST: JSON.stringify(process.env.SMTP_HOST ?? null),
-        SMTP_PORT_set: process.env.SMTP_PORT !== undefined,
-        SMTP_USER_set: Boolean(process.env.SMTP_USER),
-        SMTP_PASSWORD_set: Boolean(process.env.SMTP_PASSWORD),
+        RESEND_API_KEY_set: Boolean(process.env.RESEND_API_KEY),
         EMAIL_FROM_set: Boolean(process.env.EMAIL_FROM),
       },
-      "Email notifications DISABLED — SMTP_HOST resolved to empty. Appointment/contact submissions still work; " +
-        "patients and the clinic just won't receive emails until SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD are " +
-        "set on THIS service in the hosting provider's dashboard (exact key names, no extra whitespace) and the " +
-        "service is redeployed."
+      "Email notifications DISABLED — RESEND_API_KEY and/or EMAIL_FROM resolved to empty. Appointment/contact " +
+        "submissions still work; patients and the clinic just won't receive emails until both are set on THIS " +
+        "service in the hosting provider's dashboard (exact key names, no extra whitespace) and the service is " +
+        "redeployed."
     );
   }
 });

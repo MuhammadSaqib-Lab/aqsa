@@ -26,10 +26,10 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().optional(),
   ADMIN_PASSWORD: z.string().optional(),
 
-  SMTP_HOST: z.string().optional().default("").transform(stripMarkdownLink),
-  SMTP_PORT: z.coerce.number().int().positive().optional().default(587),
-  SMTP_USER: z.string().optional().default("").transform(stripMarkdownLink),
-  SMTP_PASSWORD: z.string().optional().default(""),
+  // Resend (HTTPS API) — not SMTP. Render blocks/throttles outbound SMTP
+  // ports on its free/standard plans, which made Nodemailer+SMTP time out
+  // (ETIMEDOUT) in production; an HTTPS-based provider avoids that entirely.
+  RESEND_API_KEY: z.string().optional().default("").transform(stripMarkdownLink),
   EMAIL_FROM: z.string().optional().default("").transform(stripMarkdownLink),
   CLINIC_NOTIFICATION_EMAIL: z.string().optional().default("").transform(stripMarkdownLink),
 

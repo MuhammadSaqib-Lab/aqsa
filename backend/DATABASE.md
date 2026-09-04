@@ -105,7 +105,7 @@ If you deploy to a managed Postgres provider (RDS, Neon, Supabase, Railway, etc.
 
 ## Security — what must never be committed or exposed
 
-- `backend/.env` — real `DATABASE_URL`, `JWT_SECRET`, admin seed credentials, SMTP credentials. Already covered by `.gitignore` (`.env`, `.env.*`, `!.env.example`).
+- `backend/.env` — real `DATABASE_URL`, `JWT_SECRET`, admin seed credentials, `RESEND_API_KEY`. Already covered by `.gitignore` (`.env`, `.env.*`, `!.env.example`).
 - `passwordHash` — never included in any API response (verified: login and `/me` responses only ever construct a plain object with `id`/`name`/`email`/`role`, never the raw Prisma row).
 - `adminNotes` — only reachable through authenticated `/api/admin/*` routes; no public endpoint returns it.
 - Raw Prisma/Postgres error messages — the centralized error handler (`backend/src/middleware/errorHandler.ts`) never forwards a raw driver error to the client; unexpected errors become a generic "Something went wrong" outside development.

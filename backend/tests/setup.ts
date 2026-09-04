@@ -4,4 +4,4 @@ process.env.JWT_SECRET = "test-only-secret-do-not-use-in-prod-123456";
 process.env.JWT_EXPIRES_IN = "1h";
 process.env.FRONTEND_URL = "http://localhost:5173";
 process.env.CLINIC_NOTIFICATION_EMAIL = "";
-process.env.SMTP_HOST = "";
+process.env.RESEND_API_KEY = "";

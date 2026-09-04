@@ -1,22 +1,17 @@
-import nodemailer, { type Transporter } from "nodemailer";
+import { Resend } from "resend";
 import { env } from "../config/env";
 import { logger } from "../config/logger";
 
-let transporter: Transporter | undefined;
+let client: Resend | undefined;
 let attemptedInit = false;
 
-function getTransporter(): Transporter | undefined {
-  if (!env.SMTP_HOST) return undefined;
-  if (!transporter && !attemptedInit) {
+function getClient(): Resend | undefined {
+  if (!env.RESEND_API_KEY) return undefined;
+  if (!client && !attemptedInit) {
     attemptedInit = true;
-    transporter = nodemailer.createTransport({
-      host: env.SMTP_HOST,
-      port: env.SMTP_PORT,
-      secure: env.SMTP_PORT === 465,
-      auth: env.SMTP_USER ? { user: env.SMTP_USER, pass: env.SMTP_PASSWORD } : undefined,
-    });
+    client = new Resend(env.RESEND_API_KEY);
   }
-  return transporter;
+  return client;
 }
 
 interface SendMailInput {
@@ -26,35 +21,35 @@ interface SendMailInput {
 }
 
 /**
- * Best-effort email send. Never throws — a missing SMTP config or a
- * delivery failure must never fail the appointment/contact submission
- * that triggered it. Callers should not `await` this on the critical path.
+ * Best-effort email send over Resend's HTTPS API (not SMTP — Render blocks
+ * outbound SMTP ports, which made the previous Nodemailer transport time
+ * out). Never throws — a missing API key or a delivery failure must never
+ * fail the appointment/contact submission that triggered it. Callers should
+ * not `await` this on the critical path.
  */
 export async function sendMail({ to, subject, text }: SendMailInput): Promise<void> {
-  const client = getTransporter();
-  if (!client) {
+  const resend = getClient();
+  if (!resend) {
     logger.warn(
       { to, subject },
-      "Email skipped — SMTP_HOST is not set. Configure SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD to enable email notifications."
+      "Email skipped — RESEND_API_KEY is not set. Configure RESEND_API_KEY/EMAIL_FROM to enable email notifications."
     );
     return;
   }
+  if (!env.EMAIL_FROM) {
+    logger.warn({ to, subject }, "Email skipped — EMAIL_FROM is not set.");
+    return;
+  }
   try {
-    const info = await client.sendMail({ from: env.EMAIL_FROM || env.SMTP_USER, to, subject, text });
-    logger.info({ to, subject, messageId: info.messageId }, "Email sent");
+    const { data, error } = await resend.emails.send({ from: env.EMAIL_FROM, to, subject, text });
+    if (error) {
+      logger.error({ to, subject, errorName: error.name, errorMessage: error.message }, "Email send failed");
+      return;
+    }
+    logger.info({ to, subject, messageId: data?.id }, "Email sent");
   } catch (err) {
-    const smtpErr = err as { code?: string; responseCode?: number; command?: string; message?: string };
-    logger.error(
-      {
-        to,
-        subject,
-        errorCode: smtpErr.code,
-        smtpResponseCode: smtpErr.responseCode,
-        smtpCommand: smtpErr.command,
-        errorMessage: smtpErr.message,
-      },
-      "Email send failed"
-    );
+    const sendErr = err as { message?: string };
+    logger.error({ to, subject, errorMessage: sendErr.message }, "Email send failed");
   }
 }
 

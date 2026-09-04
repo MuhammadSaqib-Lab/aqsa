@@ -83,7 +83,7 @@ Supabase free projects pause after a week of inactivity — you'll need to manua
    | `JWT_EXPIRES_IN` | `1d` |
    | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | not needed here — you already seeded manually in Step 1; only needed if you re-run the seed |
    | `CLINIC_TIMEZONE`, `CLINIC_OPEN_TIME`, `CLINIC_CLOSE_TIME`, `CLINIC_SLOT_MINUTES`, `CLINIC_WORKING_DAYS` | copy from `backend/.env.example`, adjust once real hours are confirmed |
-   | `SMTP_*`, `EMAIL_FROM`, `CLINIC_NOTIFICATION_EMAIL` | optional — leave blank to keep email notifications disabled |
+   | `RESEND_API_KEY`, `EMAIL_FROM`, `CLINIC_NOTIFICATION_EMAIL` | optional — leave blank to keep email notifications disabled. Uses the Resend HTTPS API, not SMTP — Render blocks outbound SMTP ports |
    | `ENABLE_API_DOCS` | leave `false`/unset unless you want Swagger UI reachable in production |
 
 4. Deploy. Once live, note the URL Render gives you, e.g. `https://aqsa-physio-api.onrender.com`.

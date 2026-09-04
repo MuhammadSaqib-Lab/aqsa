@@ -1,6 +1,19 @@
 import "dotenv/config";
 import { z } from "zod";
 
+/**
+ * Recovers a plain value from something pasted as a rendered markdown link —
+ * `[smtp.gmail.com](smtp.gmail.com)` instead of the bare value. This exact
+ * paste mistake has repeatedly corrupted FRONTEND_URL/VITE_API_URL in this
+ * project's Render/Vercel env vars, so SMTP_HOST and friends are sanitized
+ * the same defensive way rather than assuming a clean paste.
+ */
+function stripMarkdownLink(raw: string): string {
+  const trimmed = raw.trim();
+  const match = trimmed.match(/^\[([^\]]+)\]\([^)]+\)$/);
+  return match ? match[1].trim() : trimmed;
+}
+
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   PORT: z.coerce.number().int().positive().default(5000),
@@ -13,12 +26,12 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().optional(),
   ADMIN_PASSWORD: z.string().optional(),
 
-  SMTP_HOST: z.string().optional().default(""),
+  SMTP_HOST: z.string().optional().default("").transform(stripMarkdownLink),
   SMTP_PORT: z.coerce.number().int().positive().optional().default(587),
-  SMTP_USER: z.string().optional().default(""),
+  SMTP_USER: z.string().optional().default("").transform(stripMarkdownLink),
   SMTP_PASSWORD: z.string().optional().default(""),
-  EMAIL_FROM: z.string().optional().default(""),
-  CLINIC_NOTIFICATION_EMAIL: z.string().optional().default(""),
+  EMAIL_FROM: z.string().optional().default("").transform(stripMarkdownLink),
+  CLINIC_NOTIFICATION_EMAIL: z.string().optional().default("").transform(stripMarkdownLink),
 
   CLINIC_TIMEZONE: z.string().default("Asia/Karachi"),
   CLINIC_OPEN_TIME: z.string().default("09:00"),

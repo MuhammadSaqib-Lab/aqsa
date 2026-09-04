@@ -13,9 +13,20 @@ const server = app.listen(env.PORT, () => {
       "Email notifications ENABLED"
     );
   } else {
+    // Log presence (not values) of each related var so a misnamed/blank key
+    // in the hosting provider's dashboard is visible without exposing secrets.
     logger.warn(
-      "Email notifications DISABLED — SMTP_HOST is not set. Appointment/contact submissions still work; " +
-        "patients and the clinic just won't receive emails until SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD are configured."
+      {
+        SMTP_HOST: JSON.stringify(process.env.SMTP_HOST ?? null),
+        SMTP_PORT_set: process.env.SMTP_PORT !== undefined,
+        SMTP_USER_set: Boolean(process.env.SMTP_USER),
+        SMTP_PASSWORD_set: Boolean(process.env.SMTP_PASSWORD),
+        EMAIL_FROM_set: Boolean(process.env.EMAIL_FROM),
+      },
+      "Email notifications DISABLED — SMTP_HOST resolved to empty. Appointment/contact submissions still work; " +
+        "patients and the clinic just won't receive emails until SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD are " +
+        "set on THIS service in the hosting provider's dashboard (exact key names, no extra whitespace) and the " +
+        "service is redeployed."
     );
   }
 });

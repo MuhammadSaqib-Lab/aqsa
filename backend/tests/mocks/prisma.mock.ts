@@ -17,6 +17,7 @@ export const mockPrisma = {
   patient: model(),
   appointment: model(),
   contactMessage: model(),
+  review: model(),
   $transaction: vi.fn(async (arg: unknown) => {
     if (Array.isArray(arg)) return Promise.all(arg);
     if (typeof arg === "function") return arg(mockPrisma);
@@ -32,5 +33,7 @@ export function resetPrismaMock() {
   mockPrisma.appointment.count.mockResolvedValue(0);
   mockPrisma.contactMessage.findMany.mockResolvedValue([]);
   mockPrisma.contactMessage.count.mockResolvedValue(0);
+  mockPrisma.review.findMany.mockResolvedValue([]);
+  mockPrisma.review.count.mockResolvedValue(0);
   mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
 }

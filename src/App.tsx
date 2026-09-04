@@ -16,6 +16,7 @@ import { AdminLoginPage } from "./admin/pages/AdminLoginPage";
 import { DashboardHomePage } from "./admin/pages/DashboardHomePage";
 import { AppointmentsPage } from "./admin/pages/AppointmentsPage";
 import { MessagesPage } from "./admin/pages/MessagesPage";
+import { ReviewsPage } from "./admin/pages/ReviewsPage";
 import { PatientAuthProvider } from "./patient/context/PatientAuthContext";
 import { ProtectedPatientRoute } from "./patient/components/ProtectedPatientRoute";
 import { PatientLayout } from "./patient/components/PatientLayout";
@@ -59,6 +60,7 @@ export default function App() {
               <Route index element={<DashboardHomePage />} />
               <Route path="appointments" element={<AppointmentsPage />} />
               <Route path="messages" element={<MessagesPage />} />
+              <Route path="reviews" element={<ReviewsPage />} />
             </Route>
           </Route>
 

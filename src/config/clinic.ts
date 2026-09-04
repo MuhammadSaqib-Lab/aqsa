@@ -18,8 +18,10 @@ import {
   Zap,
 } from "lucide-react";
 import { UserCheck, Users, Smile, MessageCircle } from "lucide-react";
+import { CalendarClock, Home as HomeIcon, Thermometer, Waves } from "lucide-react";
 import type {
   Condition,
+  Equipment,
   Feature,
   FAQItem,
   NavLink,
@@ -171,6 +173,18 @@ export const services: Service[] = [
       "Family guidance for continued home support",
     ],
   },
+  {
+    slug: "home-physiotherapy",
+    icon: HomeIcon,
+    title: "Home Physiotherapy",
+    description:
+      "Physiotherapy care delivered at your home for patients who are unable to visit the clinic.",
+    details: [
+      "Available for patients who find it difficult to travel, including elderly, disabled, or mobility-limited patients",
+      "Offered for both male and female patients, subject to physiotherapist and area availability",
+      "The same structured assessment and treatment approach as an in-clinic visit, adapted to a home setting",
+    ],
+  },
 ];
 
 export const conditions: Condition[] = [
@@ -186,6 +200,113 @@ export const conditions: Condition[] = [
   { icon: Sparkles, name: "Posture-Related Issues" },
   { icon: Brain, name: "Stroke Recovery" },
   { icon: Shield, name: "Paediatric Conditions" },
+];
+
+/**
+ * General, professional information about equipment commonly used in
+ * physiotherapy practice. Deliberately worded as educational content
+ * ("commonly used for" / "may help with") rather than a claim that this
+ * specific clinic owns each item — no equipment inventory has been verified
+ * against the clinic's own printed material, so ownership is never asserted.
+ */
+export const equipment: Equipment[] = [
+  {
+    slug: "tens-unit",
+    icon: Zap,
+    name: "TENS (Transcutaneous Electrical Nerve Stimulation) Unit",
+    whatItDoes:
+      "A device that delivers low-voltage electrical pulses through electrode pads placed on the skin to stimulate nerves in the treated area.",
+    details: [
+      "Commonly used for temporary relief of localized muscle and joint discomfort during a treatment session",
+      "May help with pain management as part of a broader physiotherapy plan — not a standalone treatment",
+    ],
+  },
+  {
+    slug: "therapeutic-ultrasound",
+    icon: Waves,
+    name: "Therapeutic Ultrasound Machine",
+    whatItDoes:
+      "Uses sound-wave energy delivered through a handheld probe to gently warm deeper soft tissue during treatment.",
+    details: [
+      "Commonly used to support soft-tissue mobility work in areas such as the shoulder, knee, or lower back",
+      "May help with stiffness and localized discomfort when used alongside guided exercise",
+    ],
+  },
+  {
+    slug: "hot-cold-therapy",
+    icon: Thermometer,
+    name: "Hot & Cold Therapy Packs",
+    whatItDoes: "Controlled heat or cold application used before or after manual therapy and exercise sessions.",
+    details: [
+      "Commonly used to prepare muscles before treatment or calm the treated area afterward",
+      "May help with easing muscle tightness and reducing localized swelling",
+    ],
+  },
+  {
+    slug: "resistance-bands-weights",
+    icon: Dumbbell,
+    name: "Resistance Bands & Weights",
+    whatItDoes: "Graduated resistance equipment used to rebuild strength safely under guidance.",
+    details: [
+      "Commonly used throughout exercise therapy and post-surgical rehabilitation programs",
+      "May help with rebuilding strength and stability at a pace suited to the individual",
+    ],
+  },
+  {
+    slug: "parallel-bars-gait-training",
+    icon: Footprints,
+    name: "Parallel Bars & Gait Training Equipment",
+    whatItDoes:
+      "A supportive walking frame used to help patients practice safe, guided steps during early-stage mobility work.",
+    details: [
+      "Commonly used during rehabilitation from surgery, injury, or neurological conditions affecting movement",
+      "May help with regaining walking confidence and balance under close supervision",
+    ],
+  },
+  {
+    slug: "cervical-lumbar-traction",
+    icon: Bone,
+    name: "Cervical & Lumbar Traction Unit",
+    whatItDoes:
+      "A device that applies a gentle, controlled stretching force to the neck or lower back to relieve pressure on the spine.",
+    details: [
+      "Commonly used as part of structured care plans for neck and back discomfort",
+      "May help with reducing pressure-related discomfort when included in a broader treatment plan",
+    ],
+  },
+];
+
+/**
+ * Policy statement only — never names a specific physiotherapist or
+ * invents credentials/photos. States that a female physiotherapist can be
+ * requested, subject to availability, without asserting one is guaranteed
+ * or naming who it would be.
+ */
+export const femalePhysioPoints: Feature[] = [
+  {
+    icon: HeartPulse,
+    title: "Comfort & Privacy",
+    description:
+      "We understand that comfort and privacy are especially important to many female patients during physiotherapy treatment.",
+  },
+  {
+    icon: UserCheck,
+    title: "Request a Female Physiotherapist",
+    description:
+      "You're welcome to request a female physiotherapist when booking your appointment, or by letting our team know when you contact the clinic.",
+  },
+  {
+    icon: CalendarClock,
+    title: "Subject to Availability",
+    description:
+      "We do our best to accommodate this preference based on physiotherapist availability at your preferred appointment time.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Same Standard of Care",
+    description:
+      "Every patient receives the same professional, evidence-based physiotherapy care, regardless of which physiotherapist attends to them.",
+  },
 ];
 
 export const features: Feature[] = [

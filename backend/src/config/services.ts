@@ -13,4 +13,5 @@ export const SERVICE_TITLES = [
   "Exercise Therapy",
   "Posture & Mobility",
   "Neurological Rehabilitation",
+  "Home Physiotherapy",
 ] as const;

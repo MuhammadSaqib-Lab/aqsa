@@ -35,6 +35,14 @@ export const contactSubmissionLimiter = rateLimit({
   handler: jsonHandler("Too many submissions from this device. Please try again later or call us directly."),
 });
 
+export const reviewSubmissionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: jsonHandler("Too many submissions from this device. Please try again later or call us directly."),
+});
+
 /** Admin login — brute-force protection. */
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

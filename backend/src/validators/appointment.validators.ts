@@ -12,16 +12,30 @@ const dateField = z
 
 const timeField = z.string().refine(isValidTimeString, "preferredTime must be in HH:mm format");
 
+export const visitTypeEnum = z.enum(["CLINIC", "HOME"]);
+
 /** Matches AppointmentFormValues from the frontend's src/types/index.ts exactly. */
-export const createAppointmentSchema = z.object({
-  fullName: z.string().trim().min(2, "Please enter your full name.").max(120),
-  phone: z.string().trim().regex(PHONE_RE, "Please enter a valid phone number."),
-  email: z.string().trim().email("Please enter a valid email address.").max(200).optional().or(z.literal("")),
-  preferredDate: dateField,
-  preferredTime: timeField,
-  service: z.enum(SERVICE_TITLES, { errorMap: () => ({ message: "Please select a valid service." }) }),
-  message: z.string().trim().max(1000).optional().or(z.literal("")),
-});
+export const createAppointmentSchema = z
+  .object({
+    fullName: z.string().trim().min(2, "Please enter your full name.").max(120),
+    phone: z.string().trim().regex(PHONE_RE, "Please enter a valid phone number."),
+    email: z.string().trim().email("Please enter a valid email address.").max(200).optional().or(z.literal("")),
+    preferredDate: dateField,
+    preferredTime: timeField,
+    service: z.enum(SERVICE_TITLES, { errorMap: () => ({ message: "Please select a valid service." }) }),
+    message: z.string().trim().max(1000).optional().or(z.literal("")),
+    visitType: visitTypeEnum.default("CLINIC"),
+    homeAddress: z.string().trim().max(500).optional().or(z.literal("")),
+  })
+  .superRefine((data, ctx) => {
+    if (data.visitType === "HOME" && !data.homeAddress?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["homeAddress"],
+        message: "Home address is required for a home visit.",
+      });
+    }
+  });
 
 export type CreateAppointmentInput = z.infer<typeof createAppointmentSchema>;
 

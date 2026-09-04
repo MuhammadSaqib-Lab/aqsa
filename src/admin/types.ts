@@ -1,5 +1,5 @@
-export type { AppointmentStatus, ContactStatus } from "../types";
-import type { AppointmentStatus, ContactStatus } from "../types";
+export type { AppointmentStatus, ContactStatus, ReviewStatus, VisitType } from "../types";
+import type { AppointmentStatus, ContactStatus, ReviewStatus, VisitType } from "../types";
 
 export interface AdminProfile {
   id: string;
@@ -19,6 +19,8 @@ export interface AdminAppointment {
   message: string | null;
   status: AppointmentStatus;
   adminNotes: string | null;
+  visitType: VisitType;
+  homeAddress: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -30,6 +32,17 @@ export interface AdminContactMessage {
   email: string | null;
   message: string;
   status: ContactStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminReview {
+  id: string;
+  patientId: string | null;
+  patientName: string;
+  rating: number;
+  reviewText: string | null;
+  status: ReviewStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,5 +70,8 @@ export interface DashboardStats {
   };
   contactMessages: {
     new: number;
+  };
+  reviews: {
+    pending: number;
   };
 }

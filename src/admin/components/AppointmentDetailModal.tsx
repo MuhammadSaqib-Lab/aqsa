@@ -103,6 +103,16 @@ export function AppointmentDetailModal({ appointmentId, onClose, onUpdated }: Ap
               <dd className="text-text">{appointment.service}</dd>
             </div>
             <div>
+              <dt className="text-text-soft">Visit type</dt>
+              <dd className="text-text">{appointment.visitType === "HOME" ? "Home Visit" : "Clinic Visit"}</dd>
+            </div>
+            {appointment.visitType === "HOME" && (
+              <div className="sm:col-span-2">
+                <dt className="text-text-soft">Home address</dt>
+                <dd className="whitespace-pre-wrap text-text">{appointment.homeAddress ?? "—"}</dd>
+              </div>
+            )}
+            <div>
               <dt className="text-text-soft">Last updated</dt>
               <dd className="text-text">{formatDateTime(appointment.updatedAt)}</dd>
             </div>

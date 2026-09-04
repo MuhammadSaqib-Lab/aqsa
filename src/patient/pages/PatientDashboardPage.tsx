@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarClock, Plus } from "lucide-react";
+import { CalendarClock, Plus, Star } from "lucide-react";
 import * as patientApi from "../api/patientApi";
 import { ApiRequestError } from "../../lib/apiClient";
-import type { PatientAppointment, Paginated } from "../types";
+import type { PatientAppointment, PatientReview, Paginated } from "../types";
 import { LoadingBlock } from "../../admin/components/LoadingBlock";
 import { ErrorBlock } from "../../admin/components/ErrorBlock";
 import { EmptyState } from "../../admin/components/EmptyState";
 import { Pagination } from "../../admin/components/Pagination";
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { formatDateOnly, formatDateTime } from "../../admin/utils/format";
+import { Button } from "../../components/ui/Button";
+import { RateVisitModal } from "../components/RateVisitModal";
 
 const LIMIT = 10;
 
@@ -18,6 +20,8 @@ export function PatientDashboardPage() {
   const [result, setResult] = useState<Paginated<PatientAppointment> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [myReview, setMyReview] = useState<PatientReview | null | undefined>(undefined);
+  const [isRateModalOpen, setIsRateModalOpen] = useState(false);
 
   const load = () => {
     setIsLoading(true);
@@ -29,7 +33,15 @@ export function PatientDashboardPage() {
       .finally(() => setIsLoading(false));
   };
 
+  const loadReviewState = () => {
+    patientApi
+      .listMyReviews({ page: 1, limit: 1 })
+      .then((res) => setMyReview(res.items[0] ?? null))
+      .catch(() => setMyReview(null));
+  };
+
   useEffect(load, [page]);
+  useEffect(loadReviewState, []);
 
   return (
     <div className="flex flex-col gap-6">
@@ -46,6 +58,42 @@ export function PatientDashboardPage() {
           Book an Appointment
         </Link>
       </div>
+
+      {myReview !== undefined && (
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-white p-5 shadow-soft">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-light text-accent">
+              <Star className="h-5 w-5" aria-hidden="true" />
+            </span>
+            {myReview === null && (
+              <p className="text-sm text-text">Enjoyed your visit? Let us know how we did.</p>
+            )}
+            {myReview?.status === "PENDING" && (
+              <p className="text-sm text-text">Thanks — your review is awaiting approval.</p>
+            )}
+            {myReview?.status === "APPROVED" && (
+              <p className="text-sm text-text">Thank you for your review!</p>
+            )}
+            {myReview?.status === "REJECTED" && (
+              <p className="text-sm text-text">Enjoyed your visit? Let us know how we did.</p>
+            )}
+          </div>
+          {(myReview === null || myReview?.status === "REJECTED") && (
+            <Button type="button" variant="outline" onClick={() => setIsRateModalOpen(true)}>
+              Rate Your Visit
+            </Button>
+          )}
+        </div>
+      )}
+
+      <RateVisitModal
+        isOpen={isRateModalOpen}
+        onClose={() => setIsRateModalOpen(false)}
+        onSubmitted={() => {
+          setIsRateModalOpen(false);
+          loadReviewState();
+        }}
+      />
 
       <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-soft">
         {isLoading ? (
@@ -76,7 +124,14 @@ export function PatientDashboardPage() {
                       <td className="px-4 py-3.5 font-medium text-text sm:px-6">
                         {formatDateOnly(appointment.preferredDate)} · {appointment.preferredTime}
                       </td>
-                      <td className="px-4 py-3.5 text-text-muted sm:px-6">{appointment.service}</td>
+                      <td className="px-4 py-3.5 text-text-muted sm:px-6">
+                        {appointment.service}
+                        {appointment.visitType === "HOME" && (
+                          <span className="ml-2 inline-flex items-center rounded-full bg-accent-light px-2 py-0.5 text-xs font-medium text-accent-dark">
+                            Home Visit
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-3.5 text-text-muted sm:px-6">{formatDateTime(appointment.createdAt)}</td>
                       <td className="px-4 py-3.5 sm:px-6">
                         <StatusBadge status={appointment.status} />

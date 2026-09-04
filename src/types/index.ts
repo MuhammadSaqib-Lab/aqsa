@@ -2,6 +2,8 @@ import type { LucideIcon } from "lucide-react";
 
 export type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
 export type ContactStatus = "NEW" | "READ" | "REPLIED" | "ARCHIVED";
+export type VisitType = "CLINIC" | "HOME";
+export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface NavLink {
   label: string;
@@ -61,4 +63,20 @@ export interface AppointmentFormValues {
   preferredTime: string;
   service: string;
   message: string;
+}
+
+export interface Equipment {
+  slug: string;
+  icon: LucideIcon;
+  name: string;
+  whatItDoes: string;
+  details: string[];
+}
+
+export interface PublicReview {
+  id: string;
+  patientName: string;
+  rating: number;
+  reviewText: string | null;
+  createdAt: string;
 }

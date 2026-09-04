@@ -1,5 +1,5 @@
 import { apiRequest } from "../../lib/apiClient";
-import type { PatientProfile, PatientAppointment, PatientAppointmentFormValues, Paginated } from "../types";
+import type { PatientProfile, PatientAppointment, PatientAppointmentFormValues, PatientReview, Paginated } from "../types";
 
 function toQueryString<T extends object>(params: T): string {
   const search = new URLSearchParams();
@@ -54,6 +54,23 @@ export function createAppointment(values: PatientAppointmentFormValues) {
     body: {
       ...values,
       message: values.message.trim() || undefined,
+      homeAddress: values.visitType === "HOME" ? values.homeAddress.trim() : undefined,
     },
   });
+}
+
+export interface ReviewFormValues {
+  rating: number;
+  reviewText: string;
+}
+
+export function createReview(values: ReviewFormValues) {
+  return apiRequest<{ id: string }>("/reviews", {
+    method: "POST",
+    body: { rating: values.rating, reviewText: values.reviewText.trim() || undefined },
+  });
+}
+
+export function listMyReviews(filters: AppointmentFilters) {
+  return apiRequest<Paginated<PatientReview>>(`/patient/reviews${toQueryString(filters)}`);
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, CalendarClock, MessageSquare, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, CalendarClock, MessageSquare, Star, LogOut, Menu, X } from "lucide-react";
 import { useAdminAuth } from "../context/AdminAuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
@@ -9,6 +9,7 @@ const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/appointments", label: "Appointments", icon: CalendarClock, end: false },
   { to: "/admin/messages", label: "Messages", icon: MessageSquare, end: false },
+  { to: "/admin/reviews", label: "Reviews", icon: Star, end: false },
 ];
 
 function navLinkClasses(isActive: boolean) {

@@ -43,6 +43,8 @@ export async function createAppointment(
       preferredTime: input.preferredTime,
       service: input.service,
       message: input.message || null,
+      visitType: input.visitType,
+      homeAddress: input.visitType === "HOME" ? input.homeAddress || null : null,
     },
   });
   logger.info({ appointmentId: appointment.id, patientId: patient.id }, "Appointment record created — dispatching notifications");
@@ -144,6 +146,8 @@ const PATIENT_SAFE_SELECT = {
   service: true,
   message: true,
   status: true,
+  visitType: true,
+  homeAddress: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.AppointmentSelect;

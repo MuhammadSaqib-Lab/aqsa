@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CalendarClock, CheckCircle2, Clock, MessageSquare, XCircle, UserX } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock, MessageSquare, Star, XCircle, UserX } from "lucide-react";
 import * as adminApi from "../api/adminApi";
 import { ApiRequestError } from "../../lib/apiClient";
 import type { DashboardStats } from "../types";
@@ -53,7 +53,7 @@ export function DashboardHomePage() {
         ))}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           to="/admin/appointments"
           className="flex items-center justify-between rounded-2xl border border-border bg-white p-5 shadow-soft transition-shadow hover:shadow-card"
@@ -73,6 +73,16 @@ export function DashboardHomePage() {
             <p className="mt-1 text-sm text-text-soft">{stats.contactMessages.new} new message{stats.contactMessages.new === 1 ? "" : "s"}</p>
           </div>
           <MessageSquare className="h-6 w-6 text-primary" aria-hidden="true" />
+        </Link>
+        <Link
+          to="/admin/reviews"
+          className="flex items-center justify-between rounded-2xl border border-border bg-white p-5 shadow-soft transition-shadow hover:shadow-card"
+        >
+          <div>
+            <p className="font-medium text-text">Pending reviews</p>
+            <p className="mt-1 text-sm text-text-soft">{stats.reviews.pending} awaiting approval</p>
+          </div>
+          <Star className="h-6 w-6 text-primary" aria-hidden="true" />
         </Link>
       </div>
     </div>

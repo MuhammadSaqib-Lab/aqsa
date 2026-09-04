@@ -109,4 +109,56 @@ describe("POST /api/appointments", () => {
     expect(res.body.success).toBe(false);
     expect(mockPrisma.appointment.create).not.toHaveBeenCalled();
   });
+
+  it("defaults visitType to CLINIC when omitted, for backward compatibility", async () => {
+    mockPrisma.appointment.findFirst.mockResolvedValue(null);
+    mockPrisma.appointment.create.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ...validPayload,
+      email: PATIENT.email,
+      status: "PENDING",
+      visitType: "CLINIC",
+    });
+
+    const res = await request(app).post("/api/appointments").set("Cookie", authCookie()).send(validPayload);
+
+    expect(res.status).toBe(201);
+    expect(mockPrisma.appointment.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ visitType: "CLINIC", homeAddress: null }) })
+    );
+  });
+
+  it("rejects a home visit request with no home address", async () => {
+    const res = await request(app)
+      .post("/api/appointments")
+      .set("Cookie", authCookie())
+      .send({ ...validPayload, visitType: "HOME" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some((e: { path: string }) => e.path === "homeAddress")).toBe(true);
+  });
+
+  it("accepts a home visit request with a home address", async () => {
+    mockPrisma.appointment.findFirst.mockResolvedValue(null);
+    mockPrisma.appointment.create.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ...validPayload,
+      email: PATIENT.email,
+      status: "PENDING",
+      visitType: "HOME",
+      homeAddress: "House 12, Street 4, Haripur",
+    });
+
+    const res = await request(app)
+      .post("/api/appointments")
+      .set("Cookie", authCookie())
+      .send({ ...validPayload, visitType: "HOME", homeAddress: "House 12, Street 4, Haripur" });
+
+    expect(res.status).toBe(201);
+    expect(mockPrisma.appointment.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ visitType: "HOME", homeAddress: "House 12, Street 4, Haripur" }),
+      })
+    );
+  });
 });

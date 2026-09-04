@@ -32,6 +32,10 @@ function validate(values: PatientAppointmentFormValues): Errors {
   if (!values.preferredTime) errors.preferredTime = "Please choose a preferred time.";
   if (!values.service) errors.service = "Please select a service.";
 
+  if (values.visitType === "HOME" && !values.homeAddress.trim()) {
+    errors.homeAddress = "Please provide your home address for a home visit.";
+  }
+
   return errors;
 }
 
@@ -48,6 +52,8 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
     preferredTime: "",
     service: "",
     message: "",
+    visitType: "CLINIC",
+    homeAddress: "",
   };
   const [values, setValues] = useState<PatientAppointmentFormValues>(initialValues);
   const [errors, setErrors] = useState<Errors>({});
@@ -228,6 +234,51 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
           </p>
         )}
       </div>
+
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-text">
+          Visit Type <span className="text-red-500">*</span>
+        </label>
+        <div className="inline-flex rounded-full border border-border bg-bg-subtle p-1">
+          {(["CLINIC", "HOME"] as const).map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setValues((prev) => ({ ...prev, visitType: type }))}
+              aria-pressed={values.visitType === type}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                values.visitType === type ? "bg-primary text-white shadow-card" : "text-text-muted hover:text-text"
+              }`}
+            >
+              {type === "CLINIC" ? "Clinic Visit" : "Home Visit"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {values.visitType === "HOME" && (
+        <div>
+          <label htmlFor="homeAddress" className="mb-1.5 block text-sm font-medium text-text">
+            Home Address <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            id="homeAddress"
+            name="homeAddress"
+            rows={2}
+            value={values.homeAddress}
+            onChange={(e) => updateField("homeAddress", e.target.value)}
+            className={inputClasses("homeAddress")}
+            placeholder="House #, street, area, city"
+            aria-invalid={Boolean(errors.homeAddress)}
+            aria-describedby={errors.homeAddress ? "homeAddress-error" : undefined}
+          />
+          {errors.homeAddress && (
+            <p id="homeAddress-error" className="mt-1 text-xs text-red-500">
+              {errors.homeAddress}
+            </p>
+          )}
+        </div>
+      )}
 
       <div>
         <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-text">

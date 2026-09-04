@@ -98,6 +98,18 @@ describe("GET /api/patient/appointments", () => {
     expect(call.select.patientId).toBeUndefined();
   });
 
+  it("includes visitType and homeAddress in the select clause", async () => {
+    mockPrisma.patient.findUnique.mockResolvedValue(PATIENT_A);
+    mockPrisma.appointment.findMany.mockResolvedValue([]);
+    mockPrisma.appointment.count.mockResolvedValue(0);
+
+    await request(app).get("/api/patient/appointments").set("Cookie", cookieFor(PATIENT_A));
+
+    const call = mockPrisma.appointment.findMany.mock.calls[0][0];
+    expect(call.select.visitType).toBe(true);
+    expect(call.select.homeAddress).toBe(true);
+  });
+
   it("patient B can never see patient A's appointment", async () => {
     mockPrisma.patient.findUnique.mockResolvedValue(PATIENT_B);
     mockPrisma.appointment.findMany.mockResolvedValue([]); // real DB would return none for patient-b

@@ -1,4 +1,4 @@
-import type { AppointmentStatus } from "../types";
+import type { AppointmentStatus, ReviewStatus, VisitType } from "../types";
 
 export interface PatientProfile {
   id: string;
@@ -22,6 +22,8 @@ export interface PatientAppointment {
   service: string;
   message: string | null;
   status: AppointmentStatus;
+  visitType: VisitType;
+  homeAddress: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,6 +36,16 @@ export interface PatientAppointmentFormValues {
   preferredTime: string;
   service: string;
   message: string;
+  visitType: VisitType;
+  homeAddress: string;
+}
+
+export interface PatientReview {
+  id: string;
+  rating: number;
+  reviewText: string | null;
+  status: ReviewStatus;
+  createdAt: string;
 }
 
 export interface PaginationMeta {

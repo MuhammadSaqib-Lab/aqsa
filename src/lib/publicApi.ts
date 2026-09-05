@@ -1,5 +1,5 @@
 import { apiRequest } from "./apiClient";
-import type { PublicReview } from "../types";
+import type { PublicReview, ReviewStats } from "../types";
 
 export interface PaginationMeta {
   page: number;
@@ -18,6 +18,10 @@ export interface PublicReviewFilters {
   limit: number;
 }
 
+export interface PublicReviewsResponse extends Paginated<PublicReview> {
+  stats: ReviewStats;
+}
+
 export function listPublicReviews(filters: PublicReviewFilters) {
-  return apiRequest<Paginated<PublicReview>>(`/reviews?page=${filters.page}&limit=${filters.limit}`);
+  return apiRequest<PublicReviewsResponse>(`/reviews?page=${filters.page}&limit=${filters.limit}`);
 }

@@ -4,6 +4,7 @@ export type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELL
 export type ContactStatus = "NEW" | "READ" | "REPLIED" | "ARCHIVED";
 export type VisitType = "CLINIC" | "HOME";
 export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type Gender = "MALE" | "FEMALE";
 
 export interface NavLink {
   label: string;
@@ -79,4 +80,9 @@ export interface PublicReview {
   rating: number;
   reviewText: string | null;
   createdAt: string;
+}
+
+export interface ReviewStats {
+  averageRating: number;
+  totalApproved: number;
 }

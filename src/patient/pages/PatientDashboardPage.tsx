@@ -4,6 +4,7 @@ import { CalendarClock, Plus, Star } from "lucide-react";
 import * as patientApi from "../api/patientApi";
 import { ApiRequestError } from "../../lib/apiClient";
 import type { PatientAppointment, PatientReview, Paginated } from "../types";
+import type { VisitType } from "../../types";
 import { LoadingBlock } from "../../admin/components/LoadingBlock";
 import { ErrorBlock } from "../../admin/components/ErrorBlock";
 import { EmptyState } from "../../admin/components/EmptyState";
@@ -15,8 +16,15 @@ import { RateVisitModal } from "../components/RateVisitModal";
 
 const LIMIT = 10;
 
+const visitTypeOptions: { value: VisitType | ""; label: string }[] = [
+  { value: "", label: "All" },
+  { value: "CLINIC", label: "Center" },
+  { value: "HOME", label: "Home Session" },
+];
+
 export function PatientDashboardPage() {
   const [page, setPage] = useState(1);
+  const [visitType, setVisitType] = useState<VisitType | "">("");
   const [result, setResult] = useState<Paginated<PatientAppointment> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +35,7 @@ export function PatientDashboardPage() {
     setIsLoading(true);
     setError(null);
     patientApi
-      .listMyAppointments({ page, limit: LIMIT })
+      .listMyAppointments({ page, limit: LIMIT, visitType: visitType || undefined })
       .then(setResult)
       .catch((err) => setError(err instanceof ApiRequestError ? err.message : "Failed to load your appointments."))
       .finally(() => setIsLoading(false));
@@ -40,7 +48,8 @@ export function PatientDashboardPage() {
       .catch(() => setMyReview(null));
   };
 
-  useEffect(load, [page]);
+  useEffect(load, [page, visitType]);
+  useEffect(() => setPage(1), [visitType]);
   useEffect(loadReviewState, []);
 
   return (
@@ -57,6 +66,22 @@ export function PatientDashboardPage() {
           <Plus className="h-4 w-4" aria-hidden="true" />
           Book an Appointment
         </Link>
+      </div>
+
+      <div className="inline-flex w-fit rounded-full border border-border bg-white p-1 shadow-soft">
+        {visitTypeOptions.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => setVisitType(option.value)}
+            aria-pressed={visitType === option.value}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              visitType === option.value ? "bg-primary text-white shadow-card" : "text-text-muted hover:text-text"
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
 
       {myReview !== undefined && (
@@ -128,7 +153,7 @@ export function PatientDashboardPage() {
                         {appointment.service}
                         {appointment.visitType === "HOME" && (
                           <span className="ml-2 inline-flex items-center rounded-full bg-accent-light px-2 py-0.5 text-xs font-medium text-accent-dark">
-                            Home Visit
+                            Home Session
                           </span>
                         )}
                       </td>

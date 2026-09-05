@@ -1,11 +1,11 @@
-import { CalendarCheck, PhoneCall } from "lucide-react";
+import { CalendarCheck, Home, PhoneCall } from "lucide-react";
 import { clinic } from "../../config/clinic";
 import { useAppointment } from "../../context/AppointmentContext";
 import { Button } from "../ui/Button";
 import { Reveal } from "../ui/Reveal";
 
 export function AppointmentCTA() {
-  const { openAppointment } = useAppointment();
+  const { openAppointment, openHomeAppointment } = useAppointment();
 
   return (
     <section className="relative overflow-hidden bg-primary py-20 sm:py-24">
@@ -36,6 +36,14 @@ export function AppointmentCTA() {
           >
             Book an Appointment
           </Button>
+          <button
+            type="button"
+            onClick={openHomeAppointment}
+            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/40 px-7 py-3.5 text-base font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-primary"
+          >
+            <Home className="h-4 w-4" aria-hidden="true" />
+            Book a Home Appointment
+          </button>
           <a
             href="#contact"
             className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/40 px-7 py-3.5 text-base font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-primary"

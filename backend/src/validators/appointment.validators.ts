@@ -13,6 +13,7 @@ const dateField = z
 const timeField = z.string().refine(isValidTimeString, "preferredTime must be in HH:mm format");
 
 export const visitTypeEnum = z.enum(["CLINIC", "HOME"]);
+export const genderEnum = z.enum(["MALE", "FEMALE"]);
 
 /** Matches AppointmentFormValues from the frontend's src/types/index.ts exactly. */
 export const createAppointmentSchema = z
@@ -20,6 +21,7 @@ export const createAppointmentSchema = z
     fullName: z.string().trim().min(2, "Please enter your full name.").max(120),
     phone: z.string().trim().regex(PHONE_RE, "Please enter a valid phone number."),
     email: z.string().trim().email("Please enter a valid email address.").max(200).optional().or(z.literal("")),
+    gender: genderEnum,
     preferredDate: dateField,
     preferredTime: timeField,
     service: z.enum(SERVICE_TITLES, { errorMap: () => ({ message: "Please select a valid service." }) }),
@@ -64,6 +66,11 @@ export const appointmentFiltersSchema = paginationSchema.extend({
   status: appointmentStatusEnum.optional(),
   date: z.string().refine(isValidDateString, "date must be a valid date (YYYY-MM-DD)").optional(),
   search: z.string().trim().min(1).max(200).optional(),
+  visitType: visitTypeEnum.optional(),
+});
+
+export const patientAppointmentFiltersSchema = paginationSchema.extend({
+  visitType: visitTypeEnum.optional(),
 });
 
 export const idParamSchema = z.object({

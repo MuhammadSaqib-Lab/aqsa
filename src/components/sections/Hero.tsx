@@ -1,6 +1,9 @@
-import { ArrowRight, CalendarCheck, ShieldCheck, HeartHandshake, UserRound } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, CalendarCheck, Home, ShieldCheck, HeartHandshake, Star, UserRound } from "lucide-react";
 import { clinic } from "../../config/clinic";
 import { useAppointment } from "../../context/AppointmentContext";
+import { listPublicReviews } from "../../lib/publicApi";
+import type { ReviewStats } from "../../types";
 import { Button } from "../ui/Button";
 import { Reveal } from "../ui/Reveal";
 
@@ -11,7 +14,14 @@ const trustIndicators = [
 ];
 
 export function Hero() {
-  const { openAppointment } = useAppointment();
+  const { openAppointment, openHomeAppointment } = useAppointment();
+  const [reviewStats, setReviewStats] = useState<ReviewStats | null>(null);
+
+  useEffect(() => {
+    listPublicReviews({ page: 1, limit: 1 })
+      .then((res) => setReviewStats(res.stats))
+      .catch(() => setReviewStats(null));
+  }, []);
 
   return (
     <section
@@ -64,6 +74,15 @@ export function Hero() {
             >
               Explore Our Services
             </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              icon={<Home className="h-4 w-4" aria-hidden="true" />}
+              iconPosition="left"
+              onClick={openHomeAppointment}
+            >
+              Book a Home Appointment
+            </Button>
           </Reveal>
 
           <Reveal
@@ -76,6 +95,13 @@ export function Hero() {
                 {item.label}
               </div>
             ))}
+            {reviewStats && reviewStats.totalApproved > 0 && (
+              <div className="flex items-center gap-2 text-sm font-medium text-text-muted">
+                <Star className="h-4 w-4 fill-accent text-accent" aria-hidden="true" />
+                {reviewStats.averageRating.toFixed(1)} out of 5 · {reviewStats.totalApproved} review
+                {reviewStats.totalApproved === 1 ? "" : "s"}
+              </div>
+            )}
           </Reveal>
         </div>
 

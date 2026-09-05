@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, Loader2, Save, UserX, XCircle } from "lucide-react";
+import { CheckCircle2, Loader2, Save, Trash2, UserX, XCircle } from "lucide-react";
 import { Modal } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
 import { useToast } from "../../context/ToastContext";
@@ -8,11 +8,13 @@ import { ApiRequestError } from "../../lib/apiClient";
 import type { AdminAppointment, AppointmentStatus } from "../types";
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { formatDateOnly, formatDateTime } from "../utils/format";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 interface AppointmentDetailModalProps {
   appointmentId: string;
   onClose: () => void;
   onUpdated: (appointment: AdminAppointment) => void;
+  onDeleted: (id: string) => void;
 }
 
 const statusActions: { status: AppointmentStatus; label: string; icon: typeof CheckCircle2 }[] = [
@@ -22,12 +24,14 @@ const statusActions: { status: AppointmentStatus; label: string; icon: typeof Ch
   { status: "NO_SHOW", label: "Mark No-show", icon: UserX },
 ];
 
-export function AppointmentDetailModal({ appointmentId, onClose, onUpdated }: AppointmentDetailModalProps) {
+export function AppointmentDetailModal({ appointmentId, onClose, onUpdated, onDeleted }: AppointmentDetailModalProps) {
   const { showToast } = useToast();
   const [appointment, setAppointment] = useState<AdminAppointment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [notes, setNotes] = useState("");
   const [pendingAction, setPendingAction] = useState<AppointmentStatus | "notes" | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,8 +69,22 @@ export function AppointmentDetailModal({ appointmentId, onClose, onUpdated }: Ap
     }
   };
 
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await adminApi.deleteAppointment(appointmentId);
+      showToast("Appointment deleted.");
+      onDeleted(appointmentId);
+    } catch (err) {
+      showToast(err instanceof ApiRequestError ? err.message : "Delete failed. Please try again.", "error");
+      setIsDeleting(false);
+      setConfirmDeleteOpen(false);
+    }
+  };
+
   return (
-    <Modal isOpen onClose={onClose} title="Appointment Details" maxWidthClassName="max-w-2xl">
+    <>
+    <Modal isOpen={!confirmDeleteOpen} onClose={onClose} title="Appointment Details" maxWidthClassName="max-w-2xl">
       {isLoading || !appointment ? (
         <div className="flex justify-center py-10">
           <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden="true" />
@@ -104,7 +122,13 @@ export function AppointmentDetailModal({ appointmentId, onClose, onUpdated }: Ap
             </div>
             <div>
               <dt className="text-text-soft">Visit type</dt>
-              <dd className="text-text">{appointment.visitType === "HOME" ? "Home Visit" : "Clinic Visit"}</dd>
+              <dd className="text-text">{appointment.visitType === "HOME" ? "Home Session" : "Center"}</dd>
+            </div>
+            <div>
+              <dt className="text-text-soft">Gender</dt>
+              <dd className="text-text">
+                {appointment.gender === "MALE" ? "Male" : appointment.gender === "FEMALE" ? "Female" : "—"}
+              </dd>
             </div>
             {appointment.visitType === "HOME" && (
               <div className="sm:col-span-2">
@@ -143,6 +167,14 @@ export function AppointmentDetailModal({ appointmentId, onClose, onUpdated }: Ap
                   {label}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => setConfirmDeleteOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-red-200 px-3.5 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
+                Delete
+              </button>
             </div>
           </div>
 
@@ -181,5 +213,17 @@ export function AppointmentDetailModal({ appointmentId, onClose, onUpdated }: Ap
         </div>
       )}
     </Modal>
+
+    <ConfirmDialog
+      isOpen={confirmDeleteOpen}
+      title="Delete this appointment?"
+      description="This permanently deletes the appointment. This cannot be undone."
+      confirmLabel="Delete"
+      isDangerous
+      isSubmitting={isDeleting}
+      onConfirm={handleDelete}
+      onCancel={() => setConfirmDeleteOpen(false)}
+    />
+    </>
   );
 }

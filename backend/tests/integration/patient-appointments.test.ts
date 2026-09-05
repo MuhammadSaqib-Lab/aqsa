@@ -108,6 +108,19 @@ describe("GET /api/patient/appointments", () => {
     const call = mockPrisma.appointment.findMany.mock.calls[0][0];
     expect(call.select.visitType).toBe(true);
     expect(call.select.homeAddress).toBe(true);
+    expect(call.select.gender).toBe(true);
+  });
+
+  it("filters by visitType when provided", async () => {
+    mockPrisma.patient.findUnique.mockResolvedValue(PATIENT_A);
+    mockPrisma.appointment.findMany.mockResolvedValue([]);
+    mockPrisma.appointment.count.mockResolvedValue(0);
+
+    await request(app).get("/api/patient/appointments?visitType=HOME").set("Cookie", cookieFor(PATIENT_A));
+
+    expect(mockPrisma.appointment.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { patientId: PATIENT_A.id, visitType: "HOME" } })
+    );
   });
 
   it("patient B can never see patient A's appointment", async () => {

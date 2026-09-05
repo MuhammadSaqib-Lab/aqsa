@@ -85,5 +85,33 @@ describe("Reviews", () => {
 
       expect(res.status).toBe(200);
     });
+
+    it("includes correctly computed average rating and total in stats", async () => {
+      mockPrisma.review.findMany.mockResolvedValue([
+        { id: "1", patientName: "A", rating: 5, reviewText: "Good", createdAt: new Date() },
+        { id: "2", patientName: "B", rating: 4, reviewText: "Nice", createdAt: new Date() },
+      ]);
+      mockPrisma.review.count.mockResolvedValue(2);
+      mockPrisma.review.aggregate.mockResolvedValue({ _avg: { rating: 4.5 }, _count: 2 });
+
+      const res = await request(app).get("/api/reviews");
+
+      expect(res.status).toBe(200);
+      expect(mockPrisma.review.aggregate).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { status: "APPROVED" } })
+      );
+      expect(res.body.data.stats).toEqual({ averageRating: 4.5, totalApproved: 2 });
+    });
+
+    it("reports averageRating 0 (not null) when there are zero approved reviews", async () => {
+      mockPrisma.review.findMany.mockResolvedValue([]);
+      mockPrisma.review.count.mockResolvedValue(0);
+      mockPrisma.review.aggregate.mockResolvedValue({ _avg: { rating: null }, _count: 0 });
+
+      const res = await request(app).get("/api/reviews");
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.stats).toEqual({ averageRating: 0, totalApproved: 0 });
+    });
   });
 });

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 import { services } from "../../config/clinic";
 import * as patientApi from "../../patient/api/patientApi";
@@ -29,6 +30,8 @@ function validate(values: PatientAppointmentFormValues): Errors {
     }
   }
 
+  if (!values.gender) errors.gender = "Please select a gender.";
+
   if (!values.preferredTime) errors.preferredTime = "Please choose a preferred time.";
   if (!values.service) errors.service = "Please select a service.";
 
@@ -45,14 +48,16 @@ interface AppointmentFormProps {
 
 export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
   const { patient } = usePatientAuth();
+  const [searchParams] = useSearchParams();
   const initialValues: PatientAppointmentFormValues = {
     fullName: patient?.name ?? "",
     phone: patient?.phone ?? "",
+    gender: "",
     preferredDate: "",
     preferredTime: "",
     service: "",
     message: "",
-    visitType: "CLINIC",
+    visitType: searchParams.get("visit") === "home" ? "HOME" : "CLINIC",
     homeAddress: "",
   };
   const [values, setValues] = useState<PatientAppointmentFormValues>(initialValues);
@@ -163,6 +168,31 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
         </div>
       </div>
 
+      <div>
+        <label className="mb-1.5 block text-sm font-medium text-text">
+          Gender <span className="text-red-500">*</span>
+        </label>
+        <div className="inline-flex rounded-full border border-border bg-bg-subtle p-1">
+          {(["MALE", "FEMALE"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => {
+                setValues((prev) => ({ ...prev, gender: option }));
+                if (errors.gender) setErrors((prev) => ({ ...prev, gender: undefined }));
+              }}
+              aria-pressed={values.gender === option}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                values.gender === option ? "bg-primary text-white shadow-card" : "text-text-muted hover:text-text"
+              }`}
+            >
+              {option === "MALE" ? "Male" : "Female"}
+            </button>
+          ))}
+        </div>
+        {errors.gender && <p className="mt-1 text-xs text-red-500">{errors.gender}</p>}
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="preferredDate" className="mb-1.5 block text-sm font-medium text-text">
@@ -250,7 +280,7 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
                 values.visitType === type ? "bg-primary text-white shadow-card" : "text-text-muted hover:text-text"
               }`}
             >
-              {type === "CLINIC" ? "Clinic Visit" : "Home Visit"}
+              {type === "CLINIC" ? "Center" : "Home Session"}
             </button>
           ))}
         </div>

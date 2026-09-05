@@ -1,5 +1,5 @@
-export type { AppointmentStatus, ContactStatus, ReviewStatus, VisitType } from "../types";
-import type { AppointmentStatus, ContactStatus, ReviewStatus, VisitType } from "../types";
+export type { AppointmentStatus, ContactStatus, ReviewStatus, VisitType, Gender } from "../types";
+import type { AppointmentStatus, ContactStatus, ReviewStatus, VisitType, Gender } from "../types";
 
 export interface AdminProfile {
   id: string;
@@ -21,6 +21,7 @@ export interface AdminAppointment {
   adminNotes: string | null;
   visitType: VisitType;
   homeAddress: string | null;
+  gender: Gender | null;
   createdAt: string;
   updatedAt: string;
 }

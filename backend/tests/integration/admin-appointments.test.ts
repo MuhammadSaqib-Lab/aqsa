@@ -87,4 +87,39 @@ describe("Admin appointment management — security and updates", () => {
 
     expect(res.status).toBe(404);
   });
+
+  it("filters appointments by visitType", async () => {
+    mockPrisma.appointment.findMany.mockResolvedValue([]);
+    mockPrisma.appointment.count.mockResolvedValue(0);
+
+    const res = await request(app).get("/api/admin/appointments?visitType=HOME").set("Cookie", authCookie());
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.appointment.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { visitType: "HOME" } })
+    );
+  });
+
+  it("deletes an appointment", async () => {
+    mockPrisma.appointment.findUnique.mockResolvedValue({ id: APPOINTMENT_ID, status: "PENDING" });
+    mockPrisma.appointment.delete.mockResolvedValue({ id: APPOINTMENT_ID });
+
+    const res = await request(app).delete(`/api/admin/appointments/${APPOINTMENT_ID}`).set("Cookie", authCookie());
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.appointment.delete).toHaveBeenCalledWith({ where: { id: APPOINTMENT_ID } });
+  });
+
+  it("returns 404 when deleting an appointment that does not exist", async () => {
+    mockPrisma.appointment.findUnique.mockResolvedValue(null);
+
+    const res = await request(app).delete(`/api/admin/appointments/${APPOINTMENT_ID}`).set("Cookie", authCookie());
+
+    expect(res.status).toBe(404);
+  });
+
+  it("rejects unauthenticated delete requests", async () => {
+    const res = await request(app).delete(`/api/admin/appointments/${APPOINTMENT_ID}`);
+    expect(res.status).toBe(401);
+  });
 });

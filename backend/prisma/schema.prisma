@@ -43,6 +43,11 @@ enum ReviewStatus {
   REJECTED
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 model AdminUser {
   id           String    @id @default(uuid()) @db.Uuid
   name         String
@@ -72,6 +77,7 @@ model Appointment {
   adminNotes    String?
   visitType     VisitType         @default(CLINIC)
   homeAddress   String?
+  gender        Gender?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 

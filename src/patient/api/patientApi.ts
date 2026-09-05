@@ -1,5 +1,6 @@
 import { apiRequest } from "../../lib/apiClient";
 import type { PatientProfile, PatientAppointment, PatientAppointmentFormValues, PatientReview, Paginated } from "../types";
+import type { VisitType } from "../../types";
 
 function toQueryString<T extends object>(params: T): string {
   const search = new URLSearchParams();
@@ -42,6 +43,7 @@ export function me() {
 export interface AppointmentFilters {
   page: number;
   limit: number;
+  visitType?: VisitType;
 }
 
 export function listMyAppointments(filters: AppointmentFilters) {

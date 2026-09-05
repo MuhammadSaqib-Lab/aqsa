@@ -16,7 +16,9 @@ export function ProtectedPatientRoute({ children }: { children: ReactNode }) {
   }
 
   if (status === "unauthenticated") {
-    const redirect = encodeURIComponent(location.pathname);
+    // Includes the query string too (e.g. ?visit=home) so intent set before
+    // login (like a home-visit booking preference) survives the redirect.
+    const redirect = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/patient/login?redirect=${redirect}`} replace />;
   }
 

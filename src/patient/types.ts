@@ -1,4 +1,4 @@
-import type { AppointmentStatus, ReviewStatus, VisitType } from "../types";
+import type { AppointmentStatus, ReviewStatus, VisitType, Gender } from "../types";
 
 export interface PatientProfile {
   id: string;
@@ -24,6 +24,7 @@ export interface PatientAppointment {
   status: AppointmentStatus;
   visitType: VisitType;
   homeAddress: string | null;
+  gender: Gender | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,6 +33,7 @@ export interface PatientAppointment {
 export interface PatientAppointmentFormValues {
   fullName: string;
   phone: string;
+  gender: Gender | "";
   preferredDate: string;
   preferredTime: string;
   service: string;

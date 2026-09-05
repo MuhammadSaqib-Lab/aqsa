@@ -7,6 +7,7 @@ import type {
   AppointmentStatus,
   ContactStatus,
   ReviewStatus,
+  VisitType,
   DashboardStats,
   Paginated,
 } from "../types";
@@ -45,6 +46,7 @@ export interface AppointmentFilters {
   status?: AppointmentStatus;
   date?: string;
   search?: string;
+  visitType?: VisitType;
 }
 
 export function listAppointments(filters: AppointmentFilters) {
@@ -57,6 +59,10 @@ export function getAppointment(id: string) {
 
 export function updateAppointment(id: string, data: { status?: AppointmentStatus; adminNotes?: string }) {
   return apiRequest<AdminAppointment>(`/admin/appointments/${id}`, { method: "PATCH", body: data });
+}
+
+export function deleteAppointment(id: string) {
+  return apiRequest<null>(`/admin/appointments/${id}`, { method: "DELETE" });
 }
 
 export interface MessageFilters {

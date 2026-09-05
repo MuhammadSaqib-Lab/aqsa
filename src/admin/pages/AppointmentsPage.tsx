@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CalendarClock, Search } from "lucide-react";
 import * as adminApi from "../api/adminApi";
 import { ApiRequestError } from "../../lib/apiClient";
-import type { AdminAppointment, AppointmentStatus, Paginated } from "../types";
+import type { AdminAppointment, AppointmentStatus, VisitType, Paginated } from "../types";
 import { LoadingBlock } from "../components/LoadingBlock";
 import { ErrorBlock } from "../components/ErrorBlock";
 import { EmptyState } from "../components/EmptyState";
@@ -14,10 +14,16 @@ import { useDebouncedValue } from "../../hooks/useDebouncedValue";
 
 const LIMIT = 20;
 const statusOptions: (AppointmentStatus | "")[] = ["", "PENDING", "CONFIRMED", "COMPLETED", "CANCELLED", "NO_SHOW"];
+const visitTypeOptions: { value: VisitType | ""; label: string }[] = [
+  { value: "", label: "All types" },
+  { value: "CLINIC", label: "Center" },
+  { value: "HOME", label: "Home Session" },
+];
 
 export function AppointmentsPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<AppointmentStatus | "">("");
+  const [visitType, setVisitType] = useState<VisitType | "">("");
   const [date, setDate] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const search = useDebouncedValue(searchInput);
@@ -31,19 +37,35 @@ export function AppointmentsPage() {
     setIsLoading(true);
     setError(null);
     adminApi
-      .listAppointments({ page, limit: LIMIT, status: status || undefined, date: date || undefined, search: search || undefined })
+      .listAppointments({
+        page,
+        limit: LIMIT,
+        status: status || undefined,
+        date: date || undefined,
+        search: search || undefined,
+        visitType: visitType || undefined,
+      })
       .then(setResult)
       .catch((err) => setError(err instanceof ApiRequestError ? err.message : "Failed to load appointments."))
       .finally(() => setIsLoading(false));
   };
 
-  useEffect(load, [page, status, date, search]);
-  useEffect(() => setPage(1), [status, date, search]);
+  useEffect(load, [page, status, visitType, date, search]);
+  useEffect(() => setPage(1), [status, visitType, date, search]);
 
   const handleUpdated = (updated: AdminAppointment) => {
     setResult((prev) =>
       prev ? { ...prev, items: prev.items.map((a) => (a.id === updated.id ? updated : a)) } : prev
     );
+  };
+
+  const handleDeleted = (id: string) => {
+    setResult((prev) =>
+      prev
+        ? { ...prev, items: prev.items.filter((a) => a.id !== id), pagination: { ...prev.pagination, total: prev.pagination.total - 1 } }
+        : prev
+    );
+    setSelectedId(null);
   };
 
   return (
@@ -74,6 +96,18 @@ export function AppointmentsPage() {
           {statusOptions.map((opt) => (
             <option key={opt} value={opt}>
               {opt === "" ? "All statuses" : opt.replace("_", "-")}
+            </option>
+          ))}
+        </select>
+        <select
+          value={visitType}
+          onChange={(e) => setVisitType(e.target.value as VisitType | "")}
+          aria-label="Filter by visit type"
+          className="rounded-xl border border-border bg-white px-3.5 py-2.5 text-sm text-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40"
+        >
+          {visitTypeOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
             </option>
           ))}
         </select>
@@ -118,7 +152,18 @@ export function AppointmentsPage() {
                       <td className="px-4 py-3.5 text-text-muted sm:px-6">
                         {formatDateOnly(appointment.preferredDate)} · {appointment.preferredTime}
                       </td>
-                      <td className="px-4 py-3.5 text-text-muted sm:px-6">{appointment.service}</td>
+                      <td className="px-4 py-3.5 text-text-muted sm:px-6">
+                        {appointment.service}
+                        <span
+                          className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                            appointment.visitType === "HOME"
+                              ? "bg-accent-light text-accent-dark"
+                              : "bg-bg-muted text-text-soft"
+                          }`}
+                        >
+                          {appointment.visitType === "HOME" ? "Home Session" : "Center"}
+                        </span>
+                      </td>
                       <td className="px-4 py-3.5 sm:px-6">
                         <StatusBadge status={appointment.status} />
                       </td>
@@ -133,7 +178,12 @@ export function AppointmentsPage() {
       </div>
 
       {selectedId && (
-        <AppointmentDetailModal appointmentId={selectedId} onClose={() => setSelectedId(null)} onUpdated={handleUpdated} />
+        <AppointmentDetailModal
+          appointmentId={selectedId}
+          onClose={() => setSelectedId(null)}
+          onUpdated={handleUpdated}
+          onDeleted={handleDeleted}
+        />
       )}
     </div>
   );

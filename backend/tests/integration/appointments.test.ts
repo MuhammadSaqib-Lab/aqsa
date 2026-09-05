@@ -4,7 +4,17 @@ import { mockPrisma, resetPrismaMock } from "../mocks/prisma.mock";
 
 vi.mock("../../src/lib/prisma", () => ({ prisma: mockPrisma }));
 
-// Imported after the mock is registered so the app picks up the mocked client.
+// This file's test count exceeds the real submission limiter's threshold
+// (by design — the limiter protects real visitors, not test coverage), and
+// the limiter is a module-level singleton shared across every createApp()
+// call, so a fresh app per test wouldn't reset it either. Bypass just this
+// one limiter here; its own behavior is covered by contact.test.ts.
+vi.mock("../../src/middleware/rateLimiters", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../src/middleware/rateLimiters")>();
+  return { ...actual, appointmentSubmissionLimiter: (_req: unknown, _res: unknown, next: () => void) => next() };
+});
+
+// Imported after the mocks above are registered so the app picks up both.
 import { createApp } from "../../src/app";
 import { signPatientToken } from "../../src/utils/jwt";
 
@@ -30,6 +40,7 @@ function authCookie() {
 const validPayload = {
   fullName: "Test Patient",
   phone: "0300-1234567",
+  gender: "MALE",
   preferredDate: futureDate(),
   preferredTime: "10:30",
   service: "Back & Neck Pain",
@@ -159,6 +170,44 @@ describe("POST /api/appointments", () => {
       expect.objectContaining({
         data: expect.objectContaining({ visitType: "HOME", homeAddress: "House 12, Street 4, Haripur" }),
       })
+    );
+  });
+
+  it("rejects a submission with no gender", async () => {
+    const payloadWithoutGender: Partial<typeof validPayload> = { ...validPayload };
+    delete payloadWithoutGender.gender;
+    const res = await request(app).post("/api/appointments").set("Cookie", authCookie()).send(payloadWithoutGender);
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some((e: { path: string }) => e.path === "gender")).toBe(true);
+  });
+
+  it("rejects an invalid gender value", async () => {
+    const res = await request(app)
+      .post("/api/appointments")
+      .set("Cookie", authCookie())
+      .send({ ...validPayload, gender: "OTHER" });
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some((e: { path: string }) => e.path === "gender")).toBe(true);
+  });
+
+  it("accepts a valid gender and stores it", async () => {
+    mockPrisma.appointment.findFirst.mockResolvedValue(null);
+    mockPrisma.appointment.create.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ...validPayload,
+      email: PATIENT.email,
+      status: "PENDING",
+      gender: "FEMALE",
+    });
+
+    const res = await request(app)
+      .post("/api/appointments")
+      .set("Cookie", authCookie())
+      .send({ ...validPayload, gender: "FEMALE" });
+
+    expect(res.status).toBe(201);
+    expect(mockPrisma.appointment.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ gender: "FEMALE" }) })
     );
   });
 });

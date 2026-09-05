@@ -6,6 +6,7 @@ function model() {
     findFirst: vi.fn(),
     findMany: vi.fn().mockResolvedValue([]),
     count: vi.fn().mockResolvedValue(0),
+    aggregate: vi.fn().mockResolvedValue({ _avg: { rating: null }, _count: 0 }),
     create: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
@@ -35,5 +36,6 @@ export function resetPrismaMock() {
   mockPrisma.contactMessage.count.mockResolvedValue(0);
   mockPrisma.review.findMany.mockResolvedValue([]);
   mockPrisma.review.count.mockResolvedValue(0);
+  mockPrisma.review.aggregate.mockResolvedValue({ _avg: { rating: null }, _count: 0 });
   mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
 }

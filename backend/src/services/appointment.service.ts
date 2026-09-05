@@ -1,4 +1,4 @@
-import type { Appointment, AppointmentStatus, Prisma } from "@prisma/client";
+import type { Appointment, AppointmentStatus, VisitType, Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 import { ApiError } from "../utils/ApiError";
 import { logger } from "../config/logger";
@@ -45,6 +45,7 @@ export async function createAppointment(
       message: input.message || null,
       visitType: input.visitType,
       homeAddress: input.visitType === "HOME" ? input.homeAddress || null : null,
+      gender: input.gender,
     },
   });
   logger.info({ appointmentId: appointment.id, patientId: patient.id }, "Appointment record created — dispatching notifications");
@@ -74,6 +75,7 @@ export interface AppointmentFilters {
   status?: AppointmentStatus;
   date?: string;
   search?: string;
+  visitType?: VisitType;
 }
 
 export async function listAppointments(
@@ -82,6 +84,7 @@ export async function listAppointments(
   const where: Prisma.AppointmentWhereInput = {};
   if (filters.status) where.status = filters.status;
   if (filters.date) where.preferredDate = new Date(`${filters.date}T00:00:00.000Z`);
+  if (filters.visitType) where.visitType = filters.visitType;
   if (filters.search) {
     where.OR = [
       { patientName: { contains: filters.search, mode: "insensitive" } },
@@ -148,6 +151,7 @@ const PATIENT_SAFE_SELECT = {
   status: true,
   visitType: true,
   homeAddress: true,
+  gender: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.AppointmentSelect;
@@ -157,6 +161,7 @@ export type PatientAppointmentView = Prisma.AppointmentGetPayload<{ select: type
 export interface PatientAppointmentFilters {
   page: number;
   limit: number;
+  visitType?: VisitType;
 }
 
 /** patientId must come from the authenticated session in the caller — never from client input. */
@@ -165,6 +170,7 @@ export async function listPatientAppointments(
   filters: PatientAppointmentFilters
 ): Promise<PaginatedData<PatientAppointmentView>> {
   const where: Prisma.AppointmentWhereInput = { patientId };
+  if (filters.visitType) where.visitType = filters.visitType;
   const { skip, take } = toSkipTake(filters);
 
   const [items, total] = await prisma.$transaction([

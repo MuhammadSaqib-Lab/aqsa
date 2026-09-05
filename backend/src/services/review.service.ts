@@ -75,14 +75,28 @@ export interface PublicReviewFilters {
   limit: number;
 }
 
-export async function listApprovedReviews(filters: PublicReviewFilters): Promise<PaginatedData<PublicReviewView>> {
+export interface ReviewStats {
+  averageRating: number;
+  totalApproved: number;
+}
+
+export interface PublicReviewsResult extends PaginatedData<PublicReviewView> {
+  stats: ReviewStats;
+}
+
+export async function listApprovedReviews(filters: PublicReviewFilters): Promise<PublicReviewsResult> {
   const where: Prisma.ReviewWhereInput = { status: "APPROVED" };
   const { skip, take } = toSkipTake(filters);
-  const [items, total] = await prisma.$transaction([
+  const [items, total, agg] = await prisma.$transaction([
     prisma.review.findMany({ where, skip, take, orderBy: { createdAt: "desc" }, select: PUBLIC_REVIEW_SELECT }),
     prisma.review.count({ where }),
+    prisma.review.aggregate({ where, _avg: { rating: true }, _count: true }),
   ]);
-  return { items, pagination: buildPaginationMeta(filters.page, filters.limit, total) };
+  return {
+    items,
+    pagination: buildPaginationMeta(filters.page, filters.limit, total),
+    stats: { averageRating: agg._avg.rating ?? 0, totalApproved: agg._count },
+  };
 }
 
 /** patientId must come from the authenticated session in the caller — never from client input. */

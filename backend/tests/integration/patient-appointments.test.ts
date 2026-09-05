@@ -22,6 +22,7 @@ const APPOINTMENT_A = {
   preferredDate: new Date("2026-10-01T00:00:00.000Z"),
   preferredTime: "10:00",
   service: "Pain Management",
+  services: ["Pain Management"],
   message: null,
   status: "PENDING",
   adminNotes: "Internal note — must never reach the patient.",
@@ -71,6 +72,7 @@ describe("GET /api/patient/appointments", () => {
         preferredDate: APPOINTMENT_A.preferredDate,
         preferredTime: APPOINTMENT_A.preferredTime,
         service: APPOINTMENT_A.service,
+        services: APPOINTMENT_A.services,
         message: APPOINTMENT_A.message,
         status: APPOINTMENT_A.status,
         createdAt: APPOINTMENT_A.createdAt,
@@ -109,6 +111,7 @@ describe("GET /api/patient/appointments", () => {
     expect(call.select.visitType).toBe(true);
     expect(call.select.homeAddress).toBe(true);
     expect(call.select.gender).toBe(true);
+    expect(call.select.services).toBe(true);
   });
 
   it("filters by visitType when provided", async () => {

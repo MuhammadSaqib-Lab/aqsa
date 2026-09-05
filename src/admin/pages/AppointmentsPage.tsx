@@ -153,7 +153,7 @@ export function AppointmentsPage() {
                         {formatDateOnly(appointment.preferredDate)} · {appointment.preferredTime}
                       </td>
                       <td className="px-4 py-3.5 text-text-muted sm:px-6">
-                        {appointment.service}
+                        {appointment.services.length > 0 ? appointment.services.join(", ") : (appointment.service ?? "—")}
                         <span
                           className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                             appointment.visitType === "HOME"

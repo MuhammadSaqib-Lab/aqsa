@@ -41,7 +41,7 @@ export async function createAppointment(
       email: patient.email,
       preferredDate: new Date(`${input.preferredDate}T00:00:00.000Z`),
       preferredTime: input.preferredTime,
-      service: input.service,
+      services: input.services,
       message: input.message || null,
       visitType: input.visitType,
       homeAddress: input.visitType === "HOME" ? input.homeAddress || null : null,
@@ -56,7 +56,7 @@ export async function createAppointment(
     email: appointment.email,
     preferredDate: input.preferredDate,
     preferredTime: appointment.preferredTime,
-    service: appointment.service,
+    services: appointment.services,
     message: appointment.message,
   });
   notifyPatientOfAppointmentReceived({
@@ -147,6 +147,7 @@ const PATIENT_SAFE_SELECT = {
   preferredDate: true,
   preferredTime: true,
   service: true,
+  services: true,
   message: true,
   status: true,
   visitType: true,

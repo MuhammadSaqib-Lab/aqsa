@@ -71,7 +71,8 @@ model Appointment {
   email         String?
   preferredDate DateTime          @db.Date
   preferredTime String
-  service       String
+  service       String? // legacy single value — kept for old rows, no longer written
+  services      String[]          @default([])
   message       String?
   status        AppointmentStatus @default(PENDING)
   adminNotes    String?

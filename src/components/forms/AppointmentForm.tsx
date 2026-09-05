@@ -33,7 +33,7 @@ function validate(values: PatientAppointmentFormValues): Errors {
   if (!values.gender) errors.gender = "Please select a gender.";
 
   if (!values.preferredTime) errors.preferredTime = "Please choose a preferred time.";
-  if (!values.service) errors.service = "Please select a service.";
+  if (values.services.length === 0) errors.services = "Please select at least one service.";
 
   if (values.visitType === "HOME" && !values.homeAddress.trim()) {
     errors.homeAddress = "Please provide your home address for a home visit.";
@@ -55,7 +55,7 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
     gender: "",
     preferredDate: "",
     preferredTime: "",
-    service: "",
+    services: [],
     message: "",
     visitType: searchParams.get("visit") === "home" ? "HOME" : "CLINIC",
     homeAddress: "",
@@ -238,32 +238,49 @@ export function AppointmentForm({ onSuccess }: AppointmentFormProps) {
         </div>
       </div>
 
-      <div>
-        <label htmlFor="service" className="mb-1.5 block text-sm font-medium text-text">
-          Service <span className="text-red-500">*</span>
-        </label>
-        <select
-          id="service"
-          name="service"
-          value={values.service}
-          onChange={(e) => updateField("service", e.target.value)}
-          className={inputClasses("service")}
-          aria-invalid={Boolean(errors.service)}
-          aria-describedby={errors.service ? "service-error" : undefined}
+      <fieldset>
+        <legend className="mb-1.5 block text-sm font-medium text-text">
+          Services <span className="text-red-500">*</span>
+        </legend>
+        <div
+          className={`grid gap-2 rounded-xl border bg-white p-3 sm:grid-cols-2 ${
+            errors.services ? "border-red-400" : "border-border"
+          }`}
+          aria-invalid={Boolean(errors.services)}
+          aria-describedby={errors.services ? "services-error" : undefined}
         >
-          <option value="">Select a service</option>
-          {services.map((service) => (
-            <option key={service.slug} value={service.title}>
-              {service.title}
-            </option>
-          ))}
-        </select>
-        {errors.service && (
-          <p id="service-error" className="mt-1 text-xs text-red-500">
-            {errors.service}
+          {services.map((service) => {
+            const checked = values.services.includes(service.title);
+            return (
+              <label
+                key={service.slug}
+                className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-text hover:bg-bg-subtle"
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => {
+                    setValues((prev) => ({
+                      ...prev,
+                      services: checked
+                        ? prev.services.filter((title) => title !== service.title)
+                        : [...prev.services, service.title],
+                    }));
+                    if (errors.services) setErrors((prev) => ({ ...prev, services: undefined }));
+                  }}
+                  className="h-4 w-4 shrink-0 rounded border-border text-accent focus:ring-2 focus:ring-accent/40"
+                />
+                {service.title}
+              </label>
+            );
+          })}
+        </div>
+        {errors.services && (
+          <p id="services-error" className="mt-1 text-xs text-red-500">
+            {errors.services}
           </p>
         )}
-      </div>
+      </fieldset>
 
       <div>
         <label className="mb-1.5 block text-sm font-medium text-text">

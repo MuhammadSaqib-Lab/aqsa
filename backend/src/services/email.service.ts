@@ -59,7 +59,7 @@ export function notifyClinicOfNewAppointment(details: {
   email?: string | null;
   preferredDate: string;
   preferredTime: string;
-  service: string;
+  services: string[];
   message?: string | null;
 }): void {
   if (!env.CLINIC_NOTIFICATION_EMAIL) return;
@@ -72,7 +72,7 @@ export function notifyClinicOfNewAppointment(details: {
       details.email ? `Email: ${details.email}` : undefined,
       `Preferred date: ${details.preferredDate}`,
       `Preferred time: ${details.preferredTime}`,
-      `Service: ${details.service}`,
+      `Services: ${details.services.join(", ")}`,
       details.message ? `Message: ${details.message}` : undefined,
       "",
       "Status: PENDING — review and confirm in the admin dashboard.",

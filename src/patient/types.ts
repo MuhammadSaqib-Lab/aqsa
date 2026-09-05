@@ -19,7 +19,9 @@ export interface PatientAppointment {
   email: string | null;
   preferredDate: string;
   preferredTime: string;
-  service: string;
+  /** Legacy single value — only populated on appointments created before multi-service support. */
+  service: string | null;
+  services: string[];
   message: string | null;
   status: AppointmentStatus;
   visitType: VisitType;
@@ -36,7 +38,7 @@ export interface PatientAppointmentFormValues {
   gender: Gender | "";
   preferredDate: string;
   preferredTime: string;
-  service: string;
+  services: string[];
   message: string;
   visitType: VisitType;
   homeAddress: string;

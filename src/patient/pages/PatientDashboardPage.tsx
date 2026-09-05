@@ -150,7 +150,7 @@ export function PatientDashboardPage() {
                         {formatDateOnly(appointment.preferredDate)} · {appointment.preferredTime}
                       </td>
                       <td className="px-4 py-3.5 text-text-muted sm:px-6">
-                        {appointment.service}
+                        {appointment.services.length > 0 ? appointment.services.join(", ") : (appointment.service ?? "—")}
                         {appointment.visitType === "HOME" && (
                           <span className="ml-2 inline-flex items-center rounded-full bg-accent-light px-2 py-0.5 text-xs font-medium text-accent-dark">
                             Home Session

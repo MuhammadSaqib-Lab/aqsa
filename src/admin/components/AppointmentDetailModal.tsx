@@ -117,8 +117,10 @@ export function AppointmentDetailModal({ appointmentId, onClose, onUpdated, onDe
               <dd className="text-text">{appointment.preferredTime}</dd>
             </div>
             <div>
-              <dt className="text-text-soft">Service</dt>
-              <dd className="text-text">{appointment.service}</dd>
+              <dt className="text-text-soft">Service{appointment.services.length > 1 ? "s" : ""}</dt>
+              <dd className="text-text">
+                {appointment.services.length > 0 ? appointment.services.join(", ") : (appointment.service ?? "—")}
+              </dd>
             </div>
             <div>
               <dt className="text-text-soft">Visit type</dt>

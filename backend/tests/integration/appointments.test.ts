@@ -43,7 +43,7 @@ const validPayload = {
   gender: "MALE",
   preferredDate: futureDate(),
   preferredTime: "10:30",
-  service: "Back & Neck Pain",
+  services: ["Back & Neck Pain"],
   message: "Lower back pain for two weeks.",
 };
 
@@ -104,8 +104,35 @@ describe("POST /api/appointments", () => {
     const res = await request(app)
       .post("/api/appointments")
       .set("Cookie", authCookie())
-      .send({ ...validPayload, service: "Not A Real Service" });
+      .send({ ...validPayload, services: ["Not A Real Service"] });
     expect(res.status).toBe(400);
+  });
+
+  it("rejects an empty services array", async () => {
+    const res = await request(app)
+      .post("/api/appointments")
+      .set("Cookie", authCookie())
+      .send({ ...validPayload, services: [] });
+    expect(res.status).toBe(400);
+    expect(res.body.errors.some((e: { path: string }) => e.path === "services")).toBe(true);
+  });
+
+  it("accepts multiple services and stores them all", async () => {
+    mockPrisma.appointment.findFirst.mockResolvedValue(null);
+    const multiServicePayload = { ...validPayload, services: ["Pain Management", "Exercise Therapy"] };
+    mockPrisma.appointment.create.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ...multiServicePayload,
+      email: PATIENT.email,
+      status: "PENDING",
+    });
+
+    const res = await request(app).post("/api/appointments").set("Cookie", authCookie()).send(multiServicePayload);
+
+    expect(res.status).toBe(201);
+    expect(mockPrisma.appointment.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ services: ["Pain Management", "Exercise Therapy"] }) })
+    );
   });
 
   it("rejects a duplicate booking for an already-taken slot", async () => {

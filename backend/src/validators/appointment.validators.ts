@@ -24,7 +24,9 @@ export const createAppointmentSchema = z
     gender: genderEnum,
     preferredDate: dateField,
     preferredTime: timeField,
-    service: z.enum(SERVICE_TITLES, { errorMap: () => ({ message: "Please select a valid service." }) }),
+    services: z
+      .array(z.enum(SERVICE_TITLES, { errorMap: () => ({ message: "Please select a valid service." }) }))
+      .min(1, "Please select at least one service."),
     message: z.string().trim().max(1000).optional().or(z.literal("")),
     visitType: visitTypeEnum.default("CLINIC"),
     homeAddress: z.string().trim().max(500).optional().or(z.literal("")),

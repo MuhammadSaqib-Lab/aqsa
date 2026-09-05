@@ -30,14 +30,14 @@ export const openApiDocument = {
       },
       AppointmentInput: {
         type: "object",
-        required: ["fullName", "phone", "preferredDate", "preferredTime", "service"],
+        required: ["fullName", "phone", "preferredDate", "preferredTime", "services"],
         properties: {
           fullName: { type: "string" },
           phone: { type: "string" },
           email: { type: "string" },
           preferredDate: { type: "string", format: "date", example: "2026-09-15" },
           preferredTime: { type: "string", example: "10:30" },
-          service: { type: "string" },
+          services: { type: "array", items: { type: "string" }, minItems: 1 },
           message: { type: "string" },
         },
       },

@@ -98,10 +98,13 @@ export function ChatWidget() {
           </form>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-1.5">
-          <span className="whitespace-nowrap rounded-full bg-white/95 px-3 py-1 font-display text-xs font-light italic text-primary shadow-soft">
-            💭 Batkh Chats
-          </span>
+        <div className="flex flex-col items-center">
+          <div className="relative mb-2 rounded-2xl bg-white px-3.5 py-1.5 shadow-soft">
+            <span className="whitespace-nowrap font-display text-xs font-light italic text-primary">
+              Batkh Chats
+            </span>
+            <span className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 rounded-[2px] bg-white" aria-hidden="true" />
+          </div>
           <button
             type="button"
             onClick={() => setIsOpen(true)}

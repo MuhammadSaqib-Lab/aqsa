@@ -98,17 +98,19 @@ export function ChatWidget() {
           </form>
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          aria-label="Open Batkh chat assistant"
-          className="flex items-center gap-2 rounded-full bg-primary py-3 pl-4 pr-5 text-white shadow-lift transition-transform duration-300 hover:scale-105"
-        >
-          <span className="text-2xl leading-none" aria-hidden="true">
-            🦆💭
+        <div className="flex flex-col items-center gap-1.5">
+          <span className="whitespace-nowrap rounded-full bg-white/95 px-3 py-1 font-display text-xs font-light italic text-primary shadow-soft">
+            💭 Batkh Chats
           </span>
-          <span className="whitespace-nowrap text-sm font-semibold">Batkh Chats</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            aria-label="Open Batkh chat assistant"
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-2xl leading-none shadow-lift transition-transform duration-300 hover:scale-105"
+          >
+            <span aria-hidden="true">🦆</span>
+          </button>
+        </div>
       )}
     </div>
   );

@@ -5,11 +5,13 @@ import { ApiRequestError } from "../../lib/apiClient";
 import type { GalleryImage } from "../../types";
 import { Reveal } from "../ui/Reveal";
 import { SectionHeading } from "../ui/SectionHeading";
+import { Lightbox } from "../ui/Lightbox";
 
 export function Gallery() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,14 +64,19 @@ export function Gallery() {
                 delay={(index % 4) * 80}
                 className="group overflow-hidden rounded-2xl border border-border shadow-soft"
               >
-                <div className="aspect-[4/5] w-full overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setSelectedIndex(index)}
+                  aria-label={`View larger image${image.title ? `: ${image.title}` : ""}`}
+                  className="block aspect-[4/5] w-full cursor-pointer overflow-hidden border-0 bg-transparent p-0"
+                >
                   <img
                     src={image.imageUrl}
                     alt={image.title ?? "Aqsa Physiotherapy Centre"}
                     loading="lazy"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                </div>
+                </button>
                 {(image.title || image.caption) && (
                   <div className="p-4">
                     {image.title && <p className="font-medium text-text">{image.title}</p>}
@@ -81,6 +88,10 @@ export function Gallery() {
           </div>
         )}
       </div>
+
+      {selectedIndex !== null && (
+        <Lightbox images={images} index={selectedIndex} onClose={() => setSelectedIndex(null)} onIndexChange={setSelectedIndex} />
+      )}
     </section>
   );
 }

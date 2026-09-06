@@ -74,7 +74,7 @@ export const clinic = {
 export const navLinks: NavLink[] = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
-  { label: "Gallery", href: "#gallery" },
+  { label: "Gallery", href: "/gallery" },
   { label: "Services", href: "#services" },
   { label: "Conditions", href: "#conditions" },
   { label: "Why Choose Us", href: "#why-choose-us" },

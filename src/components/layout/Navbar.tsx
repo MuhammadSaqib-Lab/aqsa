@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Menu, CalendarCheck } from "lucide-react";
 import { clinic, navLinks } from "../../config/clinic";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
@@ -6,11 +7,23 @@ import { useAppointment } from "../../context/AppointmentContext";
 import { Button } from "../ui/Button";
 import { MobileMenu } from "./MobileMenu";
 
+/**
+ * Anchor links (e.g. "#about") only resolve within the current page, but the
+ * Navbar is now shared between "/" and "/gallery" — prefixing with "/" makes
+ * them always resolve to the home page's sections regardless of which route
+ * is currently active (matches the same "/#contact" pattern already used in
+ * PatientDashboardPage.tsx). Real route paths (e.g. "/gallery") pass through
+ * unchanged.
+ */
+function resolveNavHref(href: string): string {
+  return href.startsWith("#") ? `/${href}` : href;
+}
+
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { openAppointment } = useAppointment();
-  const sectionIds = navLinks.map((link) => link.href.replace("#", ""));
+  const sectionIds = navLinks.filter((link) => link.href.startsWith("#")).map((link) => link.href.slice(1));
   const activeId = useScrollSpy(sectionIds);
 
   useEffect(() => {
@@ -30,7 +43,7 @@ export function Navbar() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <a href="#home" className="flex items-center gap-2.5">
+        <a href="/#home" className="flex items-center gap-2.5">
           <img
             src="/images/logo.png"
             alt={`${clinic.name} logo`}
@@ -46,22 +59,25 @@ export function Navbar() {
         <nav aria-label="Primary" className="hidden xl:block">
           <ul className="flex items-center">
             {navLinks.map((link) => {
-              const id = link.href.replace("#", "");
-              const isActive = activeId === id;
+              const isHash = link.href.startsWith("#");
+              const isActive = isHash && activeId === link.href.slice(1);
+              const linkClassName = `relative whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                isActive ? "text-primary" : "text-text-muted hover:text-primary"
+              }`;
               return (
                 <li key={link.href} className="shrink-0">
-                  <a
-                    href={link.href}
-                    aria-current={isActive ? "page" : undefined}
-                    className={`relative whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                      isActive ? "text-primary" : "text-text-muted hover:text-primary"
-                    }`}
-                  >
-                    {link.label}
-                    {isActive && (
-                      <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent" />
-                    )}
-                  </a>
+                  {isHash ? (
+                    <a href={resolveNavHref(link.href)} aria-current={isActive ? "page" : undefined} className={linkClassName}>
+                      {link.label}
+                      {isActive && (
+                        <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent" />
+                      )}
+                    </a>
+                  ) : (
+                    <Link to={link.href} className={linkClassName}>
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               );
             })}

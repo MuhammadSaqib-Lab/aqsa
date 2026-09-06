@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { X, CalendarCheck, Phone } from "lucide-react";
 import { clinic, navLinks } from "../../config/clinic";
 import { useAppointment } from "../../context/AppointmentContext";
@@ -53,24 +54,31 @@ export function MobileMenu({ isOpen, onClose, activeId }: MobileMenuProps) {
 
         <ul className="flex flex-col gap-1">
           {navLinks.map((link, index) => {
-            const id = link.href.replace("#", "");
-            const isActive = activeId === id;
+            const isHash = link.href.startsWith("#");
+            const isActive = isHash && activeId === link.href.slice(1);
+            const linkClassName = `block rounded-xl px-4 py-3 text-base font-medium transition-colors ${
+              isActive ? "bg-accent-light text-primary" : "text-text hover:bg-bg-muted"
+            }`;
             return (
               <li
                 key={link.href}
                 className={isOpen ? "animate-fade-up" : ""}
                 style={isOpen ? { animationDelay: `${index * 40}ms` } : undefined}
               >
-                <a
-                  href={link.href}
-                  onClick={onClose}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`block rounded-xl px-4 py-3 text-base font-medium transition-colors ${
-                    isActive ? "bg-accent-light text-primary" : "text-text hover:bg-bg-muted"
-                  }`}
-                >
-                  {link.label}
-                </a>
+                {isHash ? (
+                  <a
+                    href={`/${link.href}`}
+                    onClick={onClose}
+                    aria-current={isActive ? "page" : undefined}
+                    className={linkClassName}
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link to={link.href} onClick={onClose} className={linkClassName}>
+                    {link.label}
+                  </Link>
+                )}
               </li>
             );
           })}

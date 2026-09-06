@@ -8,6 +8,7 @@ import { MobileAppointmentBar } from "./components/layout/MobileAppointmentBar";
 import { ToastProvider } from "./context/ToastContext";
 import { AppointmentProvider } from "./context/AppointmentContext";
 import Home from "./pages/Home";
+import { Gallery } from "./components/sections/Gallery";
 import NotFound from "./pages/NotFound";
 import { AdminAuthProvider } from "./admin/context/AdminAuthContext";
 import { ProtectedAdminRoute } from "./admin/components/ProtectedAdminRoute";
@@ -38,6 +39,23 @@ export default function App() {
                 <Navbar />
                 <main className="pb-20 sm:pb-0">
                   <Home />
+                </main>
+                <Footer />
+                <WhatsAppButton />
+                <BackToTopButton />
+                <MobileAppointmentBar />
+              </>
+            }
+          />
+
+          <Route
+            path="/gallery"
+            element={
+              <>
+                <ScrollProgressBar />
+                <Navbar />
+                <main className="pb-20 sm:pb-0">
+                  <Gallery />
                 </main>
                 <Footer />
                 <WhatsAppButton />

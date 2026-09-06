@@ -5,6 +5,7 @@ import { ScrollProgressBar } from "./components/layout/ScrollProgressBar";
 import { BackToTopButton } from "./components/layout/BackToTopButton";
 import { WhatsAppButton } from "./components/layout/WhatsAppButton";
 import { MobileAppointmentBar } from "./components/layout/MobileAppointmentBar";
+import { ChatWidget } from "./components/chat/ChatWidget";
 import { ToastProvider } from "./context/ToastContext";
 import { AppointmentProvider } from "./context/AppointmentContext";
 import Home from "./pages/Home";
@@ -18,6 +19,7 @@ import { DashboardHomePage } from "./admin/pages/DashboardHomePage";
 import { AppointmentsPage } from "./admin/pages/AppointmentsPage";
 import { MessagesPage } from "./admin/pages/MessagesPage";
 import { ReviewsPage } from "./admin/pages/ReviewsPage";
+import { GalleryPage } from "./admin/pages/GalleryPage";
 import { PatientAuthProvider } from "./patient/context/PatientAuthContext";
 import { ProtectedPatientRoute } from "./patient/components/ProtectedPatientRoute";
 import { PatientLayout } from "./patient/components/PatientLayout";
@@ -42,6 +44,7 @@ export default function App() {
                 </main>
                 <Footer />
                 <WhatsAppButton />
+                <ChatWidget />
                 <BackToTopButton />
                 <MobileAppointmentBar />
               </>
@@ -59,6 +62,7 @@ export default function App() {
                 </main>
                 <Footer />
                 <WhatsAppButton />
+                <ChatWidget />
                 <BackToTopButton />
                 <MobileAppointmentBar />
               </>
@@ -79,6 +83,7 @@ export default function App() {
               <Route path="appointments" element={<AppointmentsPage />} />
               <Route path="messages" element={<MessagesPage />} />
               <Route path="reviews" element={<ReviewsPage />} />
+              <Route path="gallery" element={<GalleryPage />} />
             </Route>
           </Route>
 

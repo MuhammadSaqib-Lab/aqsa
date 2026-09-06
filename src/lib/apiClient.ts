@@ -41,6 +41,11 @@ interface RequestOptions {
   timeoutMs?: number;
 }
 
+/** FormData bodies (file uploads) must not be JSON-stringified or given an explicit Content-Type — the browser sets the multipart boundary itself. */
+function isFormData(body: unknown): body is FormData {
+  return typeof FormData !== "undefined" && body instanceof FormData;
+}
+
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
@@ -55,10 +60,11 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   let response: Response;
   try {
+    const formData = isFormData(options.body) ? options.body : undefined;
     response = await fetch(url, {
       method,
-      headers: options.body ? { "Content-Type": "application/json" } : undefined,
-      body: options.body ? JSON.stringify(options.body) : undefined,
+      headers: options.body && !formData ? { "Content-Type": "application/json" } : undefined,
+      body: formData ?? (options.body ? JSON.stringify(options.body) : undefined),
       credentials: "include",
       signal: controller.signal,
     });

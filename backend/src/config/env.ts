@@ -33,6 +33,17 @@ const envSchema = z.object({
   EMAIL_FROM: z.string().optional().default("").transform(stripMarkdownLink),
   CLINIC_NOTIFICATION_EMAIL: z.string().optional().default("").transform(stripMarkdownLink),
 
+  // Cloudinary (gallery image storage) — optional. Render's own filesystem is
+  // ephemeral (wiped on every deploy/restart), so uploaded images cannot live
+  // on local disk; leaving these blank disables gallery uploads without
+  // crashing the server, same degrade-gracefully pattern as Resend above.
+  CLOUDINARY_CLOUD_NAME: z.string().optional().default("").transform(stripMarkdownLink),
+  CLOUDINARY_API_KEY: z.string().optional().default("").transform(stripMarkdownLink),
+  CLOUDINARY_API_SECRET: z.string().optional().default("").transform(stripMarkdownLink),
+
+  // Anthropic (Batkh chatbot) — optional, same degrade-gracefully pattern.
+  ANTHROPIC_API_KEY: z.string().optional().default("").transform(stripMarkdownLink),
+
   CLINIC_TIMEZONE: z.string().default("Asia/Karachi"),
   CLINIC_OPEN_TIME: z.string().default("09:00"),
   CLINIC_CLOSE_TIME: z.string().default("20:00"),

@@ -43,6 +43,15 @@ export const reviewSubmissionLimiter = rateLimit({
   handler: jsonHandler("Too many submissions from this device. Please try again later or call us directly."),
 });
 
+/** Chatbot — each message is a real API call with real cost, so this is tighter than form submissions. */
+export const chatMessageLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: jsonHandler("You've sent a lot of messages — please wait a bit before continuing the chat."),
+});
+
 /** Admin login — brute-force protection. */
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

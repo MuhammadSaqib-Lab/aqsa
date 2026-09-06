@@ -3,6 +3,7 @@ import type {
   AdminAppointment,
   AdminContactMessage,
   AdminReview,
+  AdminGalleryImage,
   AdminProfile,
   AppointmentStatus,
   ContactStatus,
@@ -105,4 +106,21 @@ export function updateReviewStatus(id: string, status: ReviewStatus) {
 
 export function deleteReview(id: string) {
   return apiRequest<null>(`/admin/reviews/${id}`, { method: "DELETE" });
+}
+
+export interface GalleryFilters {
+  page: number;
+  limit: number;
+}
+
+export function listGalleryImages(filters: GalleryFilters) {
+  return apiRequest<Paginated<AdminGalleryImage>>(`/admin/gallery${toQueryString(filters)}`);
+}
+
+export function uploadGalleryImage(formData: FormData) {
+  return apiRequest<AdminGalleryImage>("/admin/gallery", { method: "POST", body: formData });
+}
+
+export function deleteGalleryImage(id: string) {
+  return apiRequest<null>(`/admin/gallery/${id}`, { method: "DELETE" });
 }

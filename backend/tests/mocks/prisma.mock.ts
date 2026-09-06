@@ -19,6 +19,7 @@ export const mockPrisma = {
   appointment: model(),
   contactMessage: model(),
   review: model(),
+  galleryImage: model(),
   $transaction: vi.fn(async (arg: unknown) => {
     if (Array.isArray(arg)) return Promise.all(arg);
     if (typeof arg === "function") return arg(mockPrisma);
@@ -37,5 +38,7 @@ export function resetPrismaMock() {
   mockPrisma.review.findMany.mockResolvedValue([]);
   mockPrisma.review.count.mockResolvedValue(0);
   mockPrisma.review.aggregate.mockResolvedValue({ _avg: { rating: null }, _count: 0 });
+  mockPrisma.galleryImage.findMany.mockResolvedValue([]);
+  mockPrisma.galleryImage.count.mockResolvedValue(0);
   mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
 }

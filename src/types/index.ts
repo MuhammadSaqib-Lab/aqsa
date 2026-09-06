@@ -88,6 +88,9 @@ export interface ReviewStats {
 }
 
 export interface GalleryImage {
-  src: string;
-  alt: string;
+  id: string;
+  imageUrl: string;
+  title: string | null;
+  caption: string | null;
+  createdAt: string;
 }

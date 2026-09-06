@@ -141,3 +141,16 @@ model Review {
   @@index([patientId])
   @@map("reviews")
 }
+
+model GalleryImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  imageUrl  String
+  publicId  String // Cloudinary asset id — needed to delete the remote file
+  title     String?
+  caption   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@map("gallery_images")
+}

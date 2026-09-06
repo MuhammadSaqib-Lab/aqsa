@@ -5,3 +5,7 @@ process.env.JWT_EXPIRES_IN = "1h";
 process.env.FRONTEND_URL = "http://localhost:5173";
 process.env.CLINIC_NOTIFICATION_EMAIL = "";
 process.env.RESEND_API_KEY = "";
+process.env.CLOUDINARY_CLOUD_NAME = "";
+process.env.CLOUDINARY_API_KEY = "";
+process.env.CLOUDINARY_API_SECRET = "";
+process.env.ANTHROPIC_API_KEY = "";

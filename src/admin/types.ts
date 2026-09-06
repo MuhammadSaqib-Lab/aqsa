@@ -50,6 +50,16 @@ export interface AdminReview {
   updatedAt: string;
 }
 
+export interface AdminGalleryImage {
+  id: string;
+  imageUrl: string;
+  publicId: string;
+  title: string | null;
+  caption: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface PaginationMeta {
   page: number;
   limit: number;

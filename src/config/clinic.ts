@@ -24,7 +24,6 @@ import type {
   Equipment,
   Feature,
   FAQItem,
-  GalleryImage,
   NavLink,
   ProcessStepData,
   Service,
@@ -202,20 +201,6 @@ export const conditions: Condition[] = [
   { icon: Sparkles, name: "Posture-Related Issues" },
   { icon: Brain, name: "Stroke Recovery" },
   { icon: Shield, name: "Paediatric Conditions" },
-];
-
-/**
- * Genuine photos of the clinic's own equipment/treatment room. Deliberately
- * limited to shots with no identifiable patients or staff visible — the raw
- * marketing photos this project keeps at the repo root include several real
- * patients mid-treatment, which are not used here or anywhere on the public
- * site without documented consent.
- */
-export const gallery: GalleryImage[] = [
-  { src: "/images/clinic-manual-therapy.jpg", alt: "Physiotherapist providing hands-on back therapy at Aqsa Physiotherapy Centre" },
-  { src: "/images/clinic-band-exercise.jpg", alt: "Resistance band exercise therapy at Aqsa Physiotherapy Centre" },
-  { src: "/images/gallery-treatment-room.jpg", alt: "Treatment room and therapy equipment at Aqsa Physiotherapy Centre" },
-  { src: "/images/gallery-diagnostic-equipment.jpg", alt: "Diagnostic equipment at Aqsa Physiotherapy Centre" },
 ];
 
 /**

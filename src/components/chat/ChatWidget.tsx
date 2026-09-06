@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, Send, X, Loader2 } from "lucide-react";
+import { Send, X, Loader2 } from "lucide-react";
 import { sendChatMessage, type ChatMessage } from "../../lib/chatApi";
 import { ApiRequestError } from "../../lib/apiClient";
 
@@ -102,9 +102,9 @@ export function ChatWidget() {
           type="button"
           onClick={() => setIsOpen(true)}
           aria-label="Open Batkh chat assistant"
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-lift transition-transform duration-300 hover:scale-105"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-2xl leading-none shadow-lift transition-transform duration-300 hover:scale-105"
         >
-          <MessageCircle className="h-6 w-6" aria-hidden="true" />
+          <span aria-hidden="true">🦆</span>
         </button>
       )}
     </div>

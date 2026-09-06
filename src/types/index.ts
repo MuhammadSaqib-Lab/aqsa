@@ -86,3 +86,8 @@ export interface ReviewStats {
   averageRating: number;
   totalApproved: number;
 }
+
+export interface GalleryImage {
+  src: string;
+  alt: string;
+}

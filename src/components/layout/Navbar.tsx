@@ -43,23 +43,23 @@ export function Navbar() {
           </span>
         </a>
 
-        <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-1">
+        <nav aria-label="Primary" className="hidden xl:block">
+          <ul className="flex items-center">
             {navLinks.map((link) => {
               const id = link.href.replace("#", "");
               const isActive = activeId === id;
               return (
-                <li key={link.href}>
+                <li key={link.href} className="shrink-0">
                   <a
                     href={link.href}
                     aria-current={isActive ? "page" : undefined}
-                    className={`relative rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                    className={`relative whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                       isActive ? "text-primary" : "text-text-muted hover:text-primary"
                     }`}
                   >
                     {link.label}
                     {isActive && (
-                      <span className="absolute inset-x-4 -bottom-0.5 h-0.5 rounded-full bg-accent" />
+                      <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent" />
                     )}
                   </a>
                 </li>
@@ -84,7 +84,7 @@ export function Navbar() {
             onClick={() => setIsMobileMenuOpen(true)}
             aria-label="Open menu"
             aria-expanded={isMobileMenuOpen}
-            className="rounded-full p-2.5 text-primary-dark transition-colors hover:bg-bg-muted lg:hidden"
+            className="rounded-full p-2.5 text-primary-dark transition-colors hover:bg-bg-muted xl:hidden"
           >
             <Menu className="h-6 w-6" aria-hidden="true" />
           </button>

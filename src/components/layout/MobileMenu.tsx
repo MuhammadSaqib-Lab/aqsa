@@ -25,7 +25,7 @@ export function MobileMenu({ isOpen, onClose, activeId }: MobileMenuProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-40 lg:hidden ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+      className={`fixed inset-0 z-40 xl:hidden ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
       aria-hidden={!isOpen}
     >
       <div

@@ -1,5 +1,6 @@
 import { Hero } from "../components/sections/Hero";
 import { About } from "../components/sections/About";
+import { Gallery } from "../components/sections/Gallery";
 import { Services } from "../components/sections/Services";
 import { Conditions } from "../components/sections/Conditions";
 import { Equipment } from "../components/sections/Equipment";
@@ -17,6 +18,7 @@ export default function Home() {
     <>
       <Hero />
       <About />
+      <Gallery />
       <FemalePhysiotherapy />
       <Services />
       <Conditions />

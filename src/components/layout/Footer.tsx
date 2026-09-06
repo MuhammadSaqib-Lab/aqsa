@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 import { clinic, navLinks, services } from "../../config/clinic";
+import { resolveNavHref } from "../../lib/navHref";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -8,7 +10,7 @@ export function Footer() {
     <footer className="bg-primary-dark text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-4 lg:px-8">
         <div className="flex flex-col gap-4 lg:col-span-1">
-          <a href="#home" className="flex items-center gap-2.5">
+          <a href="/#home" className="flex items-center gap-2.5">
             <img
               src="/images/logo.png"
               alt={`${clinic.name} logo`}
@@ -47,9 +49,15 @@ export function Footer() {
           <ul className="flex flex-col gap-2.5">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <a href={link.href} className="text-sm text-white/80 transition-colors hover:text-accent">
-                  {link.label}
-                </a>
+                {link.href.startsWith("#") ? (
+                  <a href={resolveNavHref(link.href)} className="text-sm text-white/80 transition-colors hover:text-accent">
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link to={link.href} className="text-sm text-white/80 transition-colors hover:text-accent">
+                    {link.label}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
@@ -62,7 +70,7 @@ export function Footer() {
           <ul className="flex flex-col gap-2.5">
             {services.slice(0, 6).map((service) => (
               <li key={service.slug}>
-                <a href="#services" className="text-sm text-white/80 transition-colors hover:text-accent">
+                <a href="/#services" className="text-sm text-white/80 transition-colors hover:text-accent">
                   {service.title}
                 </a>
               </li>

@@ -4,6 +4,7 @@ import { X, CalendarCheck, Phone } from "lucide-react";
 import { clinic, navLinks } from "../../config/clinic";
 import { useAppointment } from "../../context/AppointmentContext";
 import { useLockBodyScroll } from "../../hooks/useLockBodyScroll";
+import { resolveNavHref } from "../../lib/navHref";
 import { Button } from "../ui/Button";
 
 interface MobileMenuProps {
@@ -67,7 +68,7 @@ export function MobileMenu({ isOpen, onClose, activeId }: MobileMenuProps) {
               >
                 {isHash ? (
                   <a
-                    href={`/${link.href}`}
+                    href={resolveNavHref(link.href)}
                     onClick={onClose}
                     aria-current={isActive ? "page" : undefined}
                     className={linkClassName}

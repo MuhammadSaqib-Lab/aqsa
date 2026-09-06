@@ -4,20 +4,9 @@ import { Menu, CalendarCheck } from "lucide-react";
 import { clinic, navLinks } from "../../config/clinic";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
 import { useAppointment } from "../../context/AppointmentContext";
+import { resolveNavHref } from "../../lib/navHref";
 import { Button } from "../ui/Button";
 import { MobileMenu } from "./MobileMenu";
-
-/**
- * Anchor links (e.g. "#about") only resolve within the current page, but the
- * Navbar is now shared between "/" and "/gallery" — prefixing with "/" makes
- * them always resolve to the home page's sections regardless of which route
- * is currently active (matches the same "/#contact" pattern already used in
- * PatientDashboardPage.tsx). Real route paths (e.g. "/gallery") pass through
- * unchanged.
- */
-function resolveNavHref(href: string): string {
-  return href.startsWith("#") ? `/${href}` : href;
-}
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
